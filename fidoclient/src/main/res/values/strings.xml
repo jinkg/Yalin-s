@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">FidoClient</string>
+
+    <string name="reg_request">用户 %s 尝试注册UAF设备,是否同意?</string>
+    <string name="auth_request">请求认证,是否同意?</string>
+
+    <string name="fido_asm_handle_mime">application/fido.uaf_asm+json</string>
+    <string name="fido_permission_description">This application acts as a FIDO Client. It may
+       access authentication devices available on the system, create and
+       delete FIDO registrations on behalf of other applications.</string>
+
+    <string name="action_as_browser_permission_description">This application may act as a web browser,
+       creating new and accessing existing FIDO registrations for any domain.</string>
+
+    <string name="fido_operation_mime">application/fido.uaf_client+json</string>
+
+    <string name="no_permission_description">You should contain the permission : org.fidoalliance.uaf.permissions.FIDO_CLIENT </string>
+</resources>

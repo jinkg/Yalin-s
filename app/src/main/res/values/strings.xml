@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">FidoTest</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="reg_success">Reg Success</string>
+    <string name="auth_success">Auth Success</string>
+
+
+    <string name="fido_permission_label">Act as a FIDO Client.</string>
+    <string name="fido_permission_description">This application acts as a FIDO Client. It may
+       access authentication devices available on the system, create and
+       delete FIDO registrations on behalf of other applications.</string>
+</resources>

@@ -1,0 +1,38 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.jin.fidoclient">
+
+    <permission
+        android:name="org.fidoalliance.uaf.permissions.FIDO_CLIENT"
+        android:description="@string/fido_permission_description"
+        android:label="Act as a FIDO Client."
+        android:protectionLevel="dangerous" />
+    <permission
+        android:name="org.fidoalliance.uaf.permissions.ACT_AS_WEB_BROWSER"
+        android:description="@string/action_as_browser_permission_description"
+        android:label="Act as a browser for FIDO registrations."
+        android:protectionLevel="dangerous" />
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+
+        <activity android:name=".activity.FIDOOperationActivity">
+            <intent-filter>
+                <action android:name="org.fidoalliance.intent.FIDO_OPERATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="@string/fido_operation_mime"></data>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".asm.activity.ASMOperationActivity">
+            <intent-filter>
+                <action android:name="org.fidoalliance.intent.FIDO_OPERATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="@string/fido_asm_handle_mime"></data>
+            </intent-filter>
+
+        </activity>
+    </application>
+
+</manifest>
