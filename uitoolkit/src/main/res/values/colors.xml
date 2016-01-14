@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF26C6DA</color>
+    <color name="colorPrimary">#F44336</color>
     <color name="colorPrimaryDarkTran">#303F9F</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryDark">#D32F2F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="text_on_primary">#EEEEEE</color>
 
     <color name="gray2">#D0D0D0</color>
     <color name="grey_text_color">#737880</color>
@@ -20,9 +22,6 @@
     <color name="global_background_color">#EEEEEE</color>
     <color name="loading_failed_header_color">#F8EBB8</color>
 
-    <color name="sb__background">#ff323232</color>
-    <color name="sb__text_color">#ffffffff</color>
-    <color name="sb__action_text_color">#ffffffff</color>
-    <color name="sb__action_bg_color">#1affffff</color>
+
 
 </resources>

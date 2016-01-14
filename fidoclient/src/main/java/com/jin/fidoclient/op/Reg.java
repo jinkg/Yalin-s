@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.jin.fidoclient.asm.api.ASMApi;
+import com.jin.fidoclient.asm.api.StatusCode;
+import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.ASMResponse;
 import com.jin.fidoclient.asm.msg.Request;
@@ -68,15 +70,18 @@ public class Reg extends ClientOperator {
     }
 
     @Override
-    public String assemble(String result) {
+    public String assemble(String result) throws ASMException {
         ASMResponse asmResponse = ASMResponse.fromJson(result, RegisterOut.class);
+        if (asmResponse.statusCode != StatusCode.UAF_ASM_STATUS_OK) {
+            throw new ASMException(asmResponse.statusCode);
+        }
         if (asmResponse.responseData instanceof RegisterOut) {
             RegisterOut registerOut = (RegisterOut) asmResponse.responseData;
             RegistrationResponse[] responses = new RegistrationResponse[1];
             responses[0] = wrapResponse(registerOut);
             return gson.toJson(responses);
         } else {
-            throw new IllegalStateException("reg assemble data must be a RegisterOut object");
+            throw new ASMException(StatusCode.UAF_ASM_STATUS_ERROR);
         }
     }
 

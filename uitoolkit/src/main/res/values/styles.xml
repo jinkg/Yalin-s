@@ -44,21 +44,8 @@
         <item name="android:background">@drawable/other_options_selector</item>
     </style>
 
-    <style name="Snackbar" />
-
-    <style name="Snackbar.Text">
-        <item name="android:paddingBottom">@dimen/sb__text_padding_bottom</item>
-        <item name="android:paddingLeft">@dimen/sb__text_padding_left</item>
-        <item name="android:paddingTop">@dimen/sb__text_padding_top</item>
-        <item name="android:paddingRight">@dimen/sb__text_padding_right</item>
-        <item name="android:textSize">@dimen/sb__text_size</item>
-        <item name="android:textColor">@color/sb__text_color</item>
+    <style name="ActionBarThemeOverlay" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:textColorPrimary">@color/text_on_primary</item>
+        <item name="android:textColorSecondary">@color/text_on_primary</item>
     </style>
-
-    <style name="Snackbar.Text.Action">
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textColor">@color/sb__action_text_color</item>
-        <item name="android:background">@drawable/sb__btn_bg</item>
-    </style>
-
 </resources>

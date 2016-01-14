@@ -5,7 +5,8 @@ package com.jin.fidoclient.asm.db;
  */
 public class RegRecord {
     public int id;
-    public int touchId;
+    public String type;
+    public String touchId;
     public String keyId;
     public String appId;
     public String username;
@@ -17,7 +18,12 @@ public class RegRecord {
         return this;
     }
 
-    public RegRecord touchId(int touchId) {
+    public RegRecord type(String type) {
+        this.type = type;
+        return this;
+    }
+
+    public RegRecord touchId(String touchId) {
         this.touchId = touchId;
         return this;
     }

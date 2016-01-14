@@ -5,7 +5,6 @@
             <solid android:color="@color/gray2" />
         </shape>
     </item>
-    <!-- 主体背景颜色值 -->
     <item android:bottom="1px">
         <shape>
             <solid android:color="@android:color/white" />

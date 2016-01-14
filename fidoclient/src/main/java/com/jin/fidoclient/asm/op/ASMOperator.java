@@ -19,7 +19,7 @@ public abstract class ASMOperator {
 
     protected Gson gson = new Gson();
 
-    public static ASMOperator parseMessage(int touchId, String asmMessage) {
+    public static ASMOperator parseMessage(String touchId, String asmMessage) {
         try {
             ASMRequest asmRequest;
             JSONObject jsonObject = new JSONObject(asmMessage);

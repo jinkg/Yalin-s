@@ -6,7 +6,7 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 
-import com.jin.fidotest.MyApplication;
+import com.jin.fidotest.app.MyApplication;
 
 import java.util.Map;
 
@@ -25,18 +25,21 @@ public class NetService {
 
     public static final String BASE_URL = "http://192.168.10.243:8080";
 
-    public static final String START_REG_SUB = "/v1/public/regRequest/";
-    public static final String FINISH_REG_SUB = "/v1/public/regResponse";
-    public static final String START_AUTH_SUB = "/v1/public/authRequest/";
-    public static final String FINISH_AUTH_SUB = "/v1/public/authResponse";
+    private static final String START_REG_SUB = "/v1/public/regRequest/";
+    private static final String FINISH_REG_SUB = "/v1/public/regResponse";
+    private static final String START_AUTH_SUB = "/v1/public/authRequest/";
+    private static final String FINISH_AUTH_SUB = "/v1/public/authResponse";
+    private static final String DEREG_SUB = "/v1/public/deregRequest";
 
     public static String FINISH_REG_URL;
     public static String FINISH_AUTH_URL;
+    public static String DEREG_URL;
 
     private static void init(Context context) {
         getHttpUrl(context);
         FINISH_REG_URL = HTTP_URL + FINISH_REG_SUB;
         FINISH_AUTH_URL = HTTP_URL + FINISH_AUTH_SUB;
+        DEREG_URL = HTTP_URL + DEREG_SUB;
     }
 
     public static String getHttpUrl(Context context) {

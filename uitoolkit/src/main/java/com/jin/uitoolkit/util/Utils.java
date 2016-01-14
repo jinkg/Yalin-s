@@ -64,6 +64,7 @@ public class Utils {
         int[] location = new int[2];
         v.getLocationOnScreen(location);
         location[0] += v.getWidth() / 2;
+        location[1] -= v.getHeight() / 2;
         return location;
     }
 

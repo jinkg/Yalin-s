@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/global_background_color"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/setting_rl_personal_info"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/other_options_selector">
+
+        <com.jin.uitoolkit.widget.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/setting_iv_profile"
+            android:layout_width="@dimen/zone_header_user_profile_height"
+            android:layout_height="@dimen/zone_header_user_profile_height"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="30dp"
+            android:src="@drawable/person_image_empty"
+            app:border_color="#d2d2d2"
+            app:border_width="2dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@id/setting_iv_profile"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/setting_ll_has_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/setting_tv_phone"
+                    style="@style/MeLoginTextStyle.Setting" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/setting_ll_not_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/MeLoginTextStyle.Setting"
+                    android:layout_width="@dimen/me_login_button_width"
+                    android:text="@string/not_login" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            style="@style/PersonalInfoRightImageStyle"
+            android:layout_marginRight="11dp" />
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/setting_tv_register_device"
+            style="@style/MeTextStyle"
+            android:drawableLeft="@drawable/ic_register"
+            android:text="@string/uaf_device_reg" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

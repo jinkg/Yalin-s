@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by 雅麟 on 2015/4/8.
  */
@@ -16,6 +19,7 @@ public class UAFDBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_USER_KEY_PAIR_TABLE = "user_reg";
 
     public static final String KEY_ID = "_id";
+    public static final String KEY_AUTH_TYPE = "type";
     public static final String KEY_TOUCH_ID = "touch_id";
     public static final String KEY_KEY_ID = "key_id";
     public static final String KEY_APP_ID = "app_id";
@@ -50,7 +54,8 @@ public class UAFDBHelper extends SQLiteOpenHelper {
         try {
             db.execSQL("CREATE TABLE IF NOT EXISTS " + DATABASE_USER_KEY_PAIR_TABLE
                     + " (" + KEY_ID + " INTEGER PRIMARY KEY,"
-                    + KEY_TOUCH_ID + " INTEGER,"
+                    + KEY_AUTH_TYPE + " VARCHAR,"
+                    + KEY_TOUCH_ID + " VARCHAR,"
                     + KEY_KEY_ID + " VARCHAR,"
                     + KEY_APP_ID + " VARCHAR,"
                     + KEY_USERNAME + " VARCHAR,"
@@ -69,16 +74,17 @@ public class UAFDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    public boolean hasKeyPair(SQLiteDatabase db, int touchId) {
+    public boolean registered(SQLiteDatabase db, String touchId) {
         return getUserRecord(db, touchId) != null;
     }
 
-    public RegRecord getUserRecord(SQLiteDatabase db, int touchId) {
+    public RegRecord getUserRecord(SQLiteDatabase db, String touchId) {
         RegRecord regRecord = null;
         db.beginTransaction();
         try {
             Cursor cursor = db.query(DATABASE_USER_KEY_PAIR_TABLE, new String[]{
                     KEY_ID,
+                    KEY_AUTH_TYPE,
                     KEY_KEY_ID,
                     KEY_APP_ID,
                     KEY_USERNAME,
@@ -87,6 +93,7 @@ public class UAFDBHelper extends SQLiteOpenHelper {
             }, KEY_TOUCH_ID + "='" + touchId + "'", null, null, null, KEY_ID + " ASC");
             if (cursor.moveToFirst()) {
                 int id = cursor.getInt(cursor.getColumnIndex(KEY_ID));
+                String type = cursor.getString(cursor.getColumnIndex(KEY_AUTH_TYPE));
                 String keyId = cursor.getString(cursor.getColumnIndex(KEY_KEY_ID));
                 String appId = cursor.getString(cursor.getColumnIndex(KEY_APP_ID));
                 String username = cursor.getString(cursor.getColumnIndex(KEY_USERNAME));
@@ -94,6 +101,7 @@ public class UAFDBHelper extends SQLiteOpenHelper {
                 String privateKeyBase64 = cursor.getString(cursor.getColumnIndex(KEY_USER_PRIVATE_KEY));
                 regRecord = new RegRecord()
                         .id(id)
+                        .type(type)
                         .touchId(touchId)
                         .keyId(keyId)
                         .appId(appId)
@@ -112,13 +120,60 @@ public class UAFDBHelper extends SQLiteOpenHelper {
         return regRecord;
     }
 
+    public List<RegRecord> getUserRecords(SQLiteDatabase db, String username) {
+        List<RegRecord> regRecords = null;
+        db.beginTransaction();
+        try {
+            Cursor cursor = db.query(DATABASE_USER_KEY_PAIR_TABLE, new String[]{
+                    KEY_ID,
+                    KEY_AUTH_TYPE,
+                    KEY_TOUCH_ID,
+                    KEY_KEY_ID,
+                    KEY_APP_ID,
+                    KEY_USER_PRIVATE_KEY,
+                    KEY_USER_PUBLIC_KEY,
+            }, KEY_USERNAME + "='" + username + "'", null, null, null, KEY_ID + " ASC");
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                if (regRecords == null) {
+                    regRecords = new ArrayList<>();
+                }
+                int id = cursor.getInt(cursor.getColumnIndex(KEY_ID));
+                String touchId = cursor.getString(cursor.getColumnIndex(KEY_TOUCH_ID));
+                String type = cursor.getString(cursor.getColumnIndex(KEY_AUTH_TYPE));
+                String keyId = cursor.getString(cursor.getColumnIndex(KEY_KEY_ID));
+                String appId = cursor.getString(cursor.getColumnIndex(KEY_APP_ID));
+                String publicKeyBase64 = cursor.getString(cursor.getColumnIndex(KEY_USER_PUBLIC_KEY));
+                String privateKeyBase64 = cursor.getString(cursor.getColumnIndex(KEY_USER_PRIVATE_KEY));
+                RegRecord regRecord = new RegRecord()
+                        .id(id)
+                        .type(type)
+                        .touchId(touchId)
+                        .keyId(keyId)
+                        .appId(appId)
+                        .username(username)
+                        .userPrivateKey(privateKeyBase64)
+                        .userPublicKey(publicKeyBase64);
+
+                regRecords.add(regRecord);
+            }
+            cursor.close();
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+        return regRecords;
+    }
+
     public boolean addRecord(SQLiteDatabase db, RegRecord regRecord) {
-        if (hasKeyPair(db, regRecord.touchId)) {
+        if (registered(db, regRecord.touchId)) {
             return false;
         }
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
+            values.put(KEY_AUTH_TYPE, regRecord.type);
             values.put(KEY_TOUCH_ID, regRecord.touchId);
             values.put(KEY_KEY_ID, regRecord.keyId);
             values.put(KEY_APP_ID, regRecord.appId);

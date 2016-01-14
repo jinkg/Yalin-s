@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -69,7 +68,7 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    private void processOp(int touchId) {
+    private void processOp(String touchId) {
         String result = ASMOperator.parseMessage(touchId, message).handle();
         Intent intent = ASMIntent.getASMOperationResultIntent(result);
         setResult(RESULT_OK, intent);
@@ -77,12 +76,13 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
     }
 
     void selectTouchId() {
+        final String[] ids = getResources().getStringArray(R.array.touch_ids);
         new AlertDialog.Builder(this)
-                .setItems(getResources().getStringArray(R.array.touch_ids),
+                .setItems(ids,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                                 int which) {
-                                processOp(which);
+                                processOp(ids[which]);
                             }
                         }).show();
     }
