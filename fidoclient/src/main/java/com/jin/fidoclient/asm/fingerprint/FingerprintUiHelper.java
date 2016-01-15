@@ -16,14 +16,16 @@
 
 package com.jin.fidoclient.asm.fingerprint;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.CancellationSignal;
-import android.support.annotation.RequiresPermission;
+import android.support.v4.app.ActivityCompat;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jin.fidoclient.R;
-import com.jin.fidoclient.utils.StatLog;
+import com.jin.fidoclient.api.UAFClientApi;
 
 import java.lang.reflect.Field;
 
@@ -73,6 +75,9 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
     }
 
     public boolean isFingerprintAuthAvailable() {
+        if (ActivityCompat.checkSelfPermission(UAFClientApi.getContext(), Manifest.permission.USE_FINGERPRINT) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
         return mFingerprintManager.isHardwareDetected()
                 && mFingerprintManager.hasEnrolledFingerprints();
     }
@@ -83,6 +88,9 @@ public class FingerprintUiHelper extends FingerprintManager.AuthenticationCallba
         }
         mCancellationSignal = new CancellationSignal();
         mSelfCancelled = false;
+        if (ActivityCompat.checkSelfPermission(UAFClientApi.getContext(), Manifest.permission.USE_FINGERPRINT) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         mFingerprintManager
                 .authenticate(cryptoObject, mCancellationSignal, 0 /* flags */, this, null);
         mIcon.setImageResource(R.drawable.ic_fp_40px);

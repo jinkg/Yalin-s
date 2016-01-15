@@ -1,16 +1,13 @@
 package com.jin.fidotest.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidotest.R;
 import com.jin.fidotest.data.User;
 
@@ -62,20 +59,6 @@ public class MainActivity extends BaseLoadActivity implements OnClickListener {
     @Override
     protected int getSelfNavDrawerItem() {
         return NAVDRAWER_ITEM_MAIN;
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_DISCOVER) {
-                Bundle bundle = data.getExtras();
-                String discoveryData = bundle.getString(UAFIntent.DISCOVERY_DATA_KEY);
-                String componentName = bundle.getString(UAFIntent.COMPONENT_NAME_KEY);
-                Log.d(TAG, discoveryData + " " + componentName);
-            }
-        }
     }
 
     @Override
