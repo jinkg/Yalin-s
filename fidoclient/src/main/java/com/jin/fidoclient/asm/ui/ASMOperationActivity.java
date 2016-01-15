@@ -1,4 +1,4 @@
-package com.jin.fidoclient.asm.activity;
+package com.jin.fidoclient.asm.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -24,8 +25,13 @@ import org.json.JSONObject;
  */
 public class ASMOperationActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView tvInfo;
+    private Button btnDo;
 
     private String message;
+
+    private Request OpType;
+
+    private FingerprintAuthenticationDialogFragment mFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,11 +42,13 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
 
         initView();
         initData();
+        showFingerprint();
     }
 
     private void initView() {
         tvInfo = (TextView) findViewById(R.id.tv_info);
-        findViewById(R.id.btn_do).setOnClickListener(this);
+        btnDo = (Button) findViewById(R.id.btn_do);
+        btnDo.setOnClickListener(this);
     }
 
     private void initData() {
@@ -48,24 +56,46 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
             JSONObject jsonObject = new JSONObject(message);
             String type = jsonObject.getString(ASMOperator.TYPE_KEY);
             if (type.equals(Request.Register.name())) {
+                OpType = Request.Register;
                 String registerInStr = jsonObject.getString(ASMOperator.ARGS_KEY);
                 RegisterIn registerIn = new Gson().fromJson(registerInStr, RegisterIn.class);
                 tvInfo.setText(String.format(getString(R.string.reg_request), registerIn.username));
             } else if (type.equals(Request.Authenticate.name())) {
+                OpType = Request.Authenticate;
                 tvInfo.setText(getString(R.string.auth_request));
+            } else if (type.equals(Request.Deregister.name())) {
+                OpType = Request.Deregister;
+                tvInfo.setText(getString(R.string.dereg_request));
             }
         } catch (JSONException e) {
         }
 
+        if (OpType == Request.Deregister) {
+            btnDo.setEnabled(false);
+            String result = ASMOperator.parseMessage(null, message).handle();
+            Intent intent = ASMIntent.getASMOperationResultIntent(result);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+    }
 
+    private void showFingerprint() {
+        mFragment = new FingerprintAuthenticationDialogFragment();
+        mFragment.setStage(
+                FingerprintAuthenticationDialogFragment.Stage.FINGERPRINT);
+        mFragment.show(getFragmentManager(), ASMOperationActivity.class.getSimpleName());
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_do) {
-            selectTouchId();
+            showFingerprint();
         }
+    }
+
+    public void fingerprintComplete(String fingerId) {
+        processOp(fingerId);
     }
 
     private void processOp(String touchId) {

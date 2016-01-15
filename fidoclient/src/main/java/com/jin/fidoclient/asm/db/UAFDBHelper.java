@@ -190,4 +190,16 @@ public class UAFDBHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public void delete(SQLiteDatabase db, String keyId) {
+        db.beginTransaction();
+        try {
+            db.delete(DATABASE_USER_KEY_PAIR_TABLE, KEY_KEY_ID + "=?", new String[]{keyId});
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
 }

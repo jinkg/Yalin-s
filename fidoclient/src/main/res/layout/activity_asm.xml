@@ -18,5 +18,6 @@
         android:id="@+id/btn_do"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="do" />
+        android:layout_gravity="center_horizontal"
+        android:text="retry" />
 </LinearLayout>

@@ -3,6 +3,7 @@
 
     <string name="reg_request">用户 %s 尝试注册UAF设备,是否同意?</string>
     <string name="auth_request">请求认证,是否同意?</string>
+    <string name="dereg_request">注销UAF设备,是否同意?</string>
 
     <string name="fido_asm_handle_mime">application/fido.uaf_asm+json</string>
     <string name="fido_permission_description">This application acts as a FIDO Client. It may
@@ -15,4 +16,13 @@
     <string name="fido_operation_mime">application/fido.uaf_client+json</string>
 
     <string name="no_permission_description">You should contain the permission : org.fidoalliance.uaf.permissions.FIDO_CLIENT </string>
+
+    <string name="fingerprint_hint">Touch sensor</string>
+    <string name="fingerprint_not_recognized">Fingerprint not recognized. Try again</string>
+    <string name="fingerprint_success">Fingerprint recognized</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="sign_in">Sign in</string>
+    <string name="fingerprint_description">Confirm fingerprint to continue</string>
 </resources>

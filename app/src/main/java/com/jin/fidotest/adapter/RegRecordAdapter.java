@@ -15,13 +15,18 @@ import java.util.List;
  * Created by YaLin on 2016/1/14.
  */
 public class RegRecordAdapter extends RecyclerView.Adapter<RegRecordViewHolder> {
+    public interface OnRecordItemClickListener {
+        void onItemClicked(RegRecord item);
+    }
 
     private Context mContext;
     private List<RegRecord> mRecords;
+    private OnRecordItemClickListener mListener;
 
-    public RegRecordAdapter(Context context, List<RegRecord> recordList) {
+    public RegRecordAdapter(Context context, List<RegRecord> recordList, OnRecordItemClickListener listener) {
         mContext = context;
         mRecords = recordList;
+        mListener = listener;
     }
 
     @Override
@@ -32,9 +37,17 @@ public class RegRecordAdapter extends RecyclerView.Adapter<RegRecordViewHolder> 
 
     @Override
     public void onBindViewHolder(RegRecordViewHolder holder, int position) {
-        RegRecord regRecord = mRecords.get(position);
+        final RegRecord regRecord = mRecords.get(position);
         holder.tvType.setText("touchId");
         holder.tvId.setText(regRecord.touchId);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onItemClicked(regRecord);
+                }
+            }
+        });
     }
 
     @Override

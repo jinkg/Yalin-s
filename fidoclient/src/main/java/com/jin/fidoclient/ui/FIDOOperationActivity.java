@@ -1,4 +1,4 @@
-package com.jin.fidoclient.activity;
+package com.jin.fidoclient.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,6 +45,8 @@ public class FIDOOperationActivity extends AppCompatActivity implements View.OnC
         channelBinding = extras.getString(UAFIntent.CHANNEL_BINDINGS_KEY);
         findView();
         initData();
+
+        doConfirm();
     }
 
     void findView() {

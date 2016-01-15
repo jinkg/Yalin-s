@@ -80,7 +80,7 @@ public class Auth extends ClientOperator {
         asmRequest.requestType = Request.Authenticate;
         asmRequest.args = authenticateIn;
         asmRequest.asmVersion = authenticationRequest.header.upv;
-        ASMApi.doOperaion(activity, REQUEST_ASM_OPERATION, gson.toJson(asmRequest));
+        ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, gson.toJson(asmRequest));
     }
 
     @Override

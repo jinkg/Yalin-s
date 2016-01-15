@@ -17,6 +17,11 @@
 package com.jin.fidoclient.asm.msg.obj;
 
 public class DeregisterIn {
-	public String appID;
+    public String appID;
     public String keyID;
+
+    public DeregisterIn(String appID, String keyID) {
+        this.appID = appID;
+        this.keyID = keyID;
+    }
 }

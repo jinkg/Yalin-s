@@ -23,7 +23,7 @@ public abstract class ClientOperator {
         } else if (uafMessage.contains(AUTH_TAG)) {
             return new Auth(activity, uafMessage, channelBinding);
         } else if (uafMessage.contains(DEREG_TAG)) {
-            return new Dereg(uafMessage);
+            return new Dereg(activity, uafMessage);
         }
         return new ClientOperator() {
             @Override

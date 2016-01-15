@@ -66,7 +66,7 @@ public class Reg extends ClientOperator {
         asmRequest.requestType = Request.Register;
         asmRequest.args = registerIn;
         asmRequest.asmVersion = registrationRequest.header.upv;
-        ASMApi.doOperaion(activity, REQUEST_ASM_OPERATION, gson.toJson(asmRequest));
+        ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, gson.toJson(asmRequest));
     }
 
     @Override

@@ -54,8 +54,8 @@ public class RegAssertionBuilder {
 
     public String getAssertions(String fcParams, byte[] keyId) throws Exception {
         ByteArrayOutputStream byteout = new ByteArrayOutputStream();
-        byte[] value = null;
-        int length = 0;
+        byte[] value;
+        int length;
 
         byteout.write(encodeInt(TagsEnum.TAG_UAFV1_REG_ASSERTION.id));
         value = getRegAssertion(fcParams, keyId);
@@ -70,6 +70,7 @@ public class RegAssertionBuilder {
                 TagsEnum.TAG_AAID.id).value);
         String KeyID = new String(tags.getTags()
                 .get(TagsEnum.TAG_KEYID.id).value);
+        logger.info(" : KeyID : " + KeyID);
         return ret;
     }
 

@@ -16,12 +16,21 @@
 
 package com.jin.fidoclient.op;
 
+import android.app.Activity;
+
 import com.google.gson.Gson;
+import com.jin.fidoclient.asm.api.ASMApi;
+import com.jin.fidoclient.asm.msg.ASMRequest;
+import com.jin.fidoclient.asm.msg.Request;
+import com.jin.fidoclient.asm.msg.obj.DeregisterIn;
+import com.jin.fidoclient.asm.msg.obj.RegisterIn;
 import com.jin.fidoclient.client.RegAssertionBuilder;
+import com.jin.fidoclient.msg.DeregResponse;
 import com.jin.fidoclient.msg.DeregisterAuthenticator;
 import com.jin.fidoclient.msg.DeregistrationRequest;
 import com.jin.fidoclient.msg.Operation;
 import com.jin.fidoclient.msg.OperationHeader;
+import com.jin.fidoclient.msg.RegistrationRequest;
 import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.utils.Preferences;
 
@@ -32,44 +41,37 @@ public class Dereg extends ClientOperator {
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private Gson gson = new Gson();
 
-    private String message;
+    private DeregistrationRequest deregistrationRequest;
+    private Activity activity;
 
-    public Dereg(String message) {
-        this.message = message;
+    public Dereg(Activity activity, String message) {
+        this.activity = activity;
+        this.deregistrationRequest = getDeregistrationRequest(message);
     }
 
     @Override
     public void handle() {
         logger.info("  [UAF][1]Dereg  ");
         try {
-            DeregistrationRequest reg = new DeregistrationRequest();
-            reg.header = new OperationHeader();
-            reg.header.upv = new Version(1, 0);
-            reg.header.op = Operation.Dereg;
-            reg.header.appID = Preferences.getSettingsParam("appID");
-            reg.authenticators = new DeregisterAuthenticator[1];
-            DeregisterAuthenticator deregAuth = new DeregisterAuthenticator();
-            deregAuth.aaid = RegAssertionBuilder.AAID;
-            String tmp = Preferences.getSettingsParam("keyId");
-            byte[] bytes = tmp.getBytes();
-            deregAuth.keyID = tmp;
-//				Base64.encodeToString(bytes, Base64.NO_WRAP);
-            reg.authenticators[0] = deregAuth;
+            DeregisterIn deregisterIn = new DeregisterIn(deregistrationRequest.header.appID, deregistrationRequest.authenticators[0].keyID);
 
-            logger.info("  [UAF][2]Dereg - Reg Response Formed  ");
-            Preferences.setSettingsParam("pub", "");
-            Preferences.setSettingsParam("priv", "");
-            Preferences.setSettingsParam("username", "");
-            Preferences.setSettingsParam("keyId", "");
-            logger.info("  [UAF][5]Dereg - keys stored  ");
+            ASMRequest<DeregisterIn> asmRequest = new ASMRequest<>();
+            asmRequest.requestType = Request.Deregister;
+            asmRequest.args = deregisterIn;
+            asmRequest.asmVersion = deregistrationRequest.header.upv;
+            ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, gson.toJson(asmRequest));
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     @Override
     public String assemble(String result) {
-        return null;
+        return gson.toJson(new DeregResponse((short) 0));
+    }
+
+    private DeregistrationRequest getDeregistrationRequest(String uafMsg) {
+        DeregistrationRequest[] deregistrationRequests = gson.fromJson(uafMsg, DeregistrationRequest[].class);
+        return deregistrationRequests[0];
     }
 }
