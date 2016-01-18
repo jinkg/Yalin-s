@@ -66,11 +66,13 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
             } else if (type.equals(Request.Deregister.name())) {
                 OpType = Request.Deregister;
                 tvInfo.setText(getString(R.string.dereg_request));
+            } else if (type.equals(Request.GetInfo.name())) {
+                OpType = Request.GetInfo;
             }
         } catch (JSONException e) {
         }
 
-        if (OpType == Request.Deregister) {
+        if (OpType == Request.Deregister || OpType == Request.GetInfo) {
             btnDo.setEnabled(false);
             String result = ASMOperator.parseMessage(null, message).handle();
             Intent intent = ASMIntent.getASMOperationResultIntent(result);

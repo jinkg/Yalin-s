@@ -102,7 +102,7 @@ public class UAFDBHelper extends SQLiteOpenHelper {
                 regRecord = new RegRecord()
                         .id(id)
                         .type(type)
-                        .touchId(touchId)
+                        .biometricsId(touchId)
                         .keyId(keyId)
                         .appId(appId)
                         .username(username)
@@ -147,7 +147,7 @@ public class UAFDBHelper extends SQLiteOpenHelper {
                 RegRecord regRecord = new RegRecord()
                         .id(id)
                         .type(type)
-                        .touchId(touchId)
+                        .biometricsId(touchId)
                         .keyId(keyId)
                         .appId(appId)
                         .username(username)
@@ -167,14 +167,14 @@ public class UAFDBHelper extends SQLiteOpenHelper {
     }
 
     public boolean addRecord(SQLiteDatabase db, RegRecord regRecord) {
-        if (registered(db, regRecord.touchId)) {
+        if (registered(db, regRecord.biometricsId)) {
             return false;
         }
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
             values.put(KEY_AUTH_TYPE, regRecord.type);
-            values.put(KEY_TOUCH_ID, regRecord.touchId);
+            values.put(KEY_TOUCH_ID, regRecord.biometricsId);
             values.put(KEY_KEY_ID, regRecord.keyId);
             values.put(KEY_APP_ID, regRecord.appId);
             values.put(KEY_USERNAME, regRecord.username);

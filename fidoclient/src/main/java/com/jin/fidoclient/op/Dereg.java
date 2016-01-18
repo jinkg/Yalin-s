@@ -16,42 +16,32 @@
 
 package com.jin.fidoclient.op;
 
-import android.app.Activity;
+import android.content.Context;
 
 import com.google.gson.Gson;
-import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.asm.msg.obj.DeregisterIn;
-import com.jin.fidoclient.asm.msg.obj.RegisterIn;
-import com.jin.fidoclient.client.RegAssertionBuilder;
 import com.jin.fidoclient.msg.DeregResponse;
-import com.jin.fidoclient.msg.DeregisterAuthenticator;
 import com.jin.fidoclient.msg.DeregistrationRequest;
-import com.jin.fidoclient.msg.Operation;
-import com.jin.fidoclient.msg.OperationHeader;
-import com.jin.fidoclient.msg.RegistrationRequest;
-import com.jin.fidoclient.msg.Version;
-import com.jin.fidoclient.utils.Preferences;
+import com.jin.fidoclient.utils.StatLog;
 
-import java.util.logging.Logger;
 
-public class Dereg extends ClientOperator {
+public class Dereg extends ASMMessageHandler {
+    private static final String TAG = Dereg.class.getSimpleName();
 
-    private Logger logger = Logger.getLogger(this.getClass().getName());
     private Gson gson = new Gson();
 
     private DeregistrationRequest deregistrationRequest;
-    private Activity activity;
+    private Context context;
 
-    public Dereg(Activity activity, String message) {
-        this.activity = activity;
+    public Dereg(Context context, String message) {
+        this.context = context;
         this.deregistrationRequest = getDeregistrationRequest(message);
     }
 
     @Override
-    public void handle() {
-        logger.info("  [UAF][1]Dereg  ");
+    public String generateAsmRequest() {
         try {
             DeregisterIn deregisterIn = new DeregisterIn(deregistrationRequest.header.appID, deregistrationRequest.authenticators[0].keyID);
 
@@ -59,14 +49,15 @@ public class Dereg extends ClientOperator {
             asmRequest.requestType = Request.Deregister;
             asmRequest.args = deregisterIn;
             asmRequest.asmVersion = deregistrationRequest.header.upv;
-            ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, gson.toJson(asmRequest));
+            return gson.toJson(asmRequest);
         } catch (Exception e) {
-            e.printStackTrace();
+            StatLog.printLog(TAG, "generate dereg asm request error. error is:" + e.getMessage());
+            return null;
         }
     }
 
     @Override
-    public String assemble(String result) {
+    public String parseAsmResponse(String asmResponseMsg) {
         return gson.toJson(new DeregResponse((short) 0));
     }
 

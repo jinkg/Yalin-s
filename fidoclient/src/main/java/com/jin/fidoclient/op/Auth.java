@@ -16,11 +16,10 @@
 package com.jin.fidoclient.op;
 
 
-import android.app.Activity;
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.api.StatusCode;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
@@ -36,16 +35,16 @@ import com.jin.fidoclient.msg.FinalChallengeParams;
 import com.jin.fidoclient.msg.OperationHeader;
 import com.jin.fidoclient.utils.Utils;
 
-public class Auth extends ClientOperator {
+public class Auth extends ASMMessageHandler {
 
     private final AuthenticationRequest authenticationRequest;
-    private final Activity activity;
+    private final Context activity;
     private final ChannelBinding channelBinding;
 
     private String finalChallenge;
 
-    public Auth(Activity activity, String message, String channelBinding) {
-        this.activity = activity;
+    public Auth(Context context, String message, String channelBinding) {
+        this.activity = context;
         try {
             authenticationRequest = getAuthRequest(message);
         } catch (Exception e) {
@@ -61,7 +60,7 @@ public class Auth extends ClientOperator {
     }
 
     @Override
-    public void handle() {
+    public String generateAsmRequest() {
         String facetId = Utils.getFacetId(activity);
         if (TextUtils.isEmpty(authenticationRequest.header.appID)) {
             authenticationRequest.header.appID = facetId;
@@ -80,12 +79,12 @@ public class Auth extends ClientOperator {
         asmRequest.requestType = Request.Authenticate;
         asmRequest.args = authenticateIn;
         asmRequest.asmVersion = authenticationRequest.header.upv;
-        ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, gson.toJson(asmRequest));
+        return  gson.toJson(asmRequest);
     }
 
     @Override
-    public String assemble(String result) throws ASMException {
-        ASMResponse asmResponse = ASMResponse.fromJson(result, AuthenticateOut.class);
+    public String parseAsmResponse(String asmResponseMsg) throws ASMException {
+        ASMResponse asmResponse = ASMResponse.fromJson(asmResponseMsg, AuthenticateOut.class);
         if (asmResponse.statusCode != StatusCode.UAF_ASM_STATUS_OK) {
             throw new ASMException(asmResponse.statusCode);
         }

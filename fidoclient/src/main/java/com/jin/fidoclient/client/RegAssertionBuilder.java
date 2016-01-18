@@ -16,6 +16,7 @@
 
 package com.jin.fidoclient.client;
 
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.jin.fidoclient.crypto.Asn1;
@@ -42,14 +43,17 @@ import java.util.logging.Logger;
 
 public class RegAssertionBuilder {
 
-    public static final String AAID = "EBA0#0001";
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private KeyPair keyPair = null;
     private TlvAssertionParser parser = new TlvAssertionParser();
+    private String aaid;
 
-    public RegAssertionBuilder(KeyPair keyPair) {
+    public RegAssertionBuilder(KeyPair keyPair, String aaid) {
+        if (keyPair == null || TextUtils.isEmpty(aaid)) {
+            throw new IllegalArgumentException();
+        }
         this.keyPair = keyPair;
-
+        this.aaid = aaid;
     }
 
     public String getAssertions(String fcParams, byte[] keyId) throws Exception {
@@ -210,7 +214,7 @@ public class RegAssertionBuilder {
 
     private byte[] getAAID() throws IOException {
         ByteArrayOutputStream byteout = new ByteArrayOutputStream();
-        byte[] value = AAID.getBytes();
+        byte[] value = aaid.getBytes();
         byteout.write(value);
         return byteout.toByteArray();
     }

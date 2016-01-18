@@ -33,6 +33,8 @@ public abstract class ASMOperator {
             } else if (requestType.equals(Request.Deregister.name())) {
                 asmRequest = ASMRequest.fromJson(asmMessage, DeregisterIn.class);
                 return new Dereg(asmRequest);
+            } else if (requestType.equals(Request.GetInfo.name())) {
+                return new GetInfo();
             }
         } catch (JSONException e) {
         }

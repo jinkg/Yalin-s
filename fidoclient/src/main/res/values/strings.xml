@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">FidoClient</string>
 
-    <string name="reg_request">用户 %s 尝试注册UAF设备,是否同意?</string>
-    <string name="auth_request">请求认证,是否同意?</string>
-    <string name="dereg_request">注销UAF设备,是否同意?</string>
+    <string name="reg_request">User %s try to register UAF device,agree?</string>
+    <string name="auth_request">You need verify,agree?</string>
+    <string name="dereg_request">Deregister UAF device,agree?</string>
 
     <string name="fido_asm_handle_mime">application/fido.uaf_asm+json</string>
     <string name="fido_permission_description">This application acts as a FIDO Client. It may
@@ -25,4 +25,6 @@
     <string name="ok">Ok</string>
     <string name="sign_in">Sign in</string>
     <string name="fingerprint_description">Confirm fingerprint to continue</string>
+
+    <string name="message_error">error: uaf message is empty</string>
 </resources>

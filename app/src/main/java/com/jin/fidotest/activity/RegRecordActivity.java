@@ -240,7 +240,7 @@ public class RegRecordActivity extends BaseLoadActivity implements RegRecordAdap
 
     protected void showConfirmAction(final RegRecord regRecord) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(String.format(getString(R.string.dereg_title), regRecord.touchId));
+        builder.setTitle(String.format(getString(R.string.dereg_title), regRecord.biometricsId));
         builder.setMessage(getString(R.string.dereg_prompt));
         builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
             @Override

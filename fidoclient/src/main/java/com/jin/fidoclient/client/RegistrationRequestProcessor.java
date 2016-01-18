@@ -25,9 +25,9 @@ import java.security.KeyPair;
 
 public class RegistrationRequestProcessor {
 
-    public RegisterOut processRequest(RegisterIn registerIn, KeyPair keyPair, byte[] keyId) {
+    public RegisterOut processRequest(RegisterIn registerIn, KeyPair keyPair, byte[] keyId, String aaid) {
         RegisterOut registerOut = new RegisterOut();
-        RegAssertionBuilder builder = new RegAssertionBuilder(keyPair);
+        RegAssertionBuilder builder = new RegAssertionBuilder(keyPair, aaid);
 
         setAppId(registerIn, registerOut);
 
