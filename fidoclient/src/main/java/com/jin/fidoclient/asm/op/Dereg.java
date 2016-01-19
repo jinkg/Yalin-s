@@ -22,34 +22,33 @@ import com.jin.fidoclient.api.UAFClientApi;
 import com.jin.fidoclient.asm.db.UAFDBHelper;
 import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.obj.DeregisterIn;
+import com.jin.fidoclient.utils.StatLog;
 
 import java.util.logging.Logger;
 
 public class Dereg extends ASMOperator {
+    private static final String TAG = Dereg.class.getSimpleName();
+    private final ASMRequest request;
+    private final HandleResultCallback callback;
 
-    private Logger logger = Logger.getLogger(this.getClass().getName());
-
-    private ASMRequest request;
-
-    public Dereg(ASMRequest request) {
+    public Dereg(ASMRequest request, HandleResultCallback callback) {
         if (!(request.args instanceof DeregisterIn)) {
             throw new IllegalStateException("asm request must has a DeregisterIn object");
         }
         this.request = request;
+        this.callback = callback;
     }
 
     @Override
-    public String handle() {
-        logger.info("  [UAF][1]Dereg  ");
-        try {
-            String keyId = ((DeregisterIn) (request.args)).keyID;
+    public void handle() {
+        StatLog.printLog(TAG, "asm dereg delete record");
+        String keyId = ((DeregisterIn) (request.args)).keyID;
 
-            UAFDBHelper dbHelper = UAFDBHelper.getInstance(UAFClientApi.getContext());
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
-            dbHelper.delete(db, keyId);
-        } catch (Exception e) {
-            e.printStackTrace();
+        UAFDBHelper dbHelper = UAFDBHelper.getInstance(UAFClientApi.getContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        dbHelper.delete(db, keyId);
+        if (callback != null) {
+            callback.onHandleResult(null);
         }
-        return null;
     }
 }

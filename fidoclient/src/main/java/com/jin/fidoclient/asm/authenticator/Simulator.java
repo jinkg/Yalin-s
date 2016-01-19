@@ -1,5 +1,8 @@
 package com.jin.fidoclient.asm.authenticator;
 
+import android.app.Activity;
+import android.support.annotation.NonNull;
+
 import com.jin.fidoclient.asm.msg.obj.AuthenticateIn;
 import com.jin.fidoclient.asm.msg.obj.AuthenticateOut;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
@@ -14,6 +17,12 @@ import java.security.NoSuchProviderException;
  * Created by YaLin on 2016/1/18.
  */
 public abstract class Simulator {
+    public interface BiometricsAuthResultCallback {
+        void onAuthSuccess(Simulator simulator, String biometricsId);
+
+        void onAuthFailed(Simulator simulator);
+    }
+
     protected static final int UAF_ALG_SIGN_SECP256R1_ECDSA_SHA256_RAW = 0x01;
     protected static final int UAF_ALG_SIGN_SECP256R1_ECDSA_SHA256_DER = 0x02;
     protected static final int UAF_ALG_SIGN_RSASSA_PSS_SHA256_RAW = 0x03;
@@ -67,19 +76,27 @@ public abstract class Simulator {
 
     }
 
-    public static RegisterOut register(String biometricsId, RegisterIn registerIn, int authenticatorIndex) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
-        Simulator simulator = SimulatorA.getInstance();
+    public static Simulator getInstance(int index) {
+        if (index == 1) {
+            return SimulatorA.getInstance();
+        } else return SimulatorB.getInstance();
+    }
+
+    public static RegisterOut register(@NonNull String biometricsId, @NonNull RegisterIn registerIn, @NonNull int authenticatorIndex) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+        Simulator simulator = getInstance(authenticatorIndex);
         return simulator.register(biometricsId, registerIn);
     }
 
-    public static AuthenticateOut authenticate(String biometricsId, AuthenticateIn authenticateIn, int authenticatorIndex) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
-        Simulator simulator = SimulatorA.getInstance();
+    public static AuthenticateOut authenticate(@NonNull String biometricsId, @NonNull AuthenticateIn authenticateIn, @NonNull int authenticatorIndex) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+        Simulator simulator = getInstance(authenticatorIndex);
         return simulator.authenticate(biometricsId, authenticateIn);
     }
 
-    public abstract RegisterOut register(String biometricsId, RegisterIn registerIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException;
+    public abstract void showBiometricsAuth(@NonNull Activity activity, BiometricsAuthResultCallback callback);
 
-    public abstract AuthenticateOut authenticate(String biometricsId, AuthenticateIn authenticateIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException;
+    public abstract RegisterOut register(@NonNull String biometricsId, @NonNull RegisterIn registerIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException;
+
+    public abstract AuthenticateOut authenticate(@NonNull String biometricsId, @NonNull AuthenticateIn authenticateIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException;
 
     protected abstract String getKeyId();
 

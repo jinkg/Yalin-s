@@ -3,8 +3,15 @@ package com.jin.fidoclient.op;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.jin.fidoclient.asm.authenticator.Simulator;
 import com.jin.fidoclient.asm.exceptions.ASMException;
+import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
+import com.jin.fidoclient.msg.MatchCriteria;
+import com.jin.fidoclient.msg.Policy;
 import com.jin.fidoclient.msg.client.UAFIntentType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by YaLin on 2016/1/11.
@@ -44,4 +51,36 @@ public abstract class ASMMessageHandler {
     public abstract String generateAsmRequest();
 
     public abstract String parseAsmResponse(String asmResponseMsg) throws ASMException;
+
+    protected List<AuthenticatorInfo> parsePolicy(Policy policy) {
+        List<AuthenticatorInfo> authenticatorInfoList = new ArrayList<>();
+        AuthenticatorInfo[] authenticatorInfos = Simulator.discover();
+        for (AuthenticatorInfo info : authenticatorInfos) {
+            for (MatchCriteria[] criterias : policy.accepted) {
+                boolean setMatch = true;
+                for (MatchCriteria criteria : criterias) {
+                    if (!criteria.isMatch(info)) {
+                        setMatch = false;
+                        break;
+                    }
+                }
+                if (setMatch) {
+                    authenticatorInfoList.add(info);
+                    break;
+                }
+            }
+        }
+
+        if (policy.disallowed != null) {
+            for (AuthenticatorInfo info : authenticatorInfoList) {
+                for (MatchCriteria matchCriteria : policy.disallowed) {
+                    if (matchCriteria.isMatch(info)) {
+                        authenticatorInfoList.remove(info);
+                        break;
+                    }
+                }
+            }
+        }
+        return authenticatorInfoList;
+    }
 }

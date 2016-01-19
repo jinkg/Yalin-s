@@ -20,6 +20,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.google.gson.Gson;
 import com.jin.fidoclient.asm.api.StatusCode;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
@@ -27,16 +28,20 @@ import com.jin.fidoclient.asm.msg.ASMResponse;
 import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.asm.msg.obj.AuthenticateIn;
 import com.jin.fidoclient.asm.msg.obj.AuthenticateOut;
+import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.msg.AuthenticationRequest;
 import com.jin.fidoclient.msg.AuthenticationResponse;
 import com.jin.fidoclient.msg.AuthenticatorSignAssertion;
 import com.jin.fidoclient.msg.ChannelBinding;
 import com.jin.fidoclient.msg.FinalChallengeParams;
 import com.jin.fidoclient.msg.OperationHeader;
+import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidoclient.utils.Utils;
 
-public class Auth extends ASMMessageHandler {
+import java.util.List;
 
+public class Auth extends ASMMessageHandler {
+    private static final String TAG = Auth.class.getSimpleName();
     private final AuthenticationRequest authenticationRequest;
     private final Context activity;
     private final ChannelBinding channelBinding;
@@ -75,11 +80,18 @@ public class Auth extends ASMMessageHandler {
         finalChallenge = Base64.encodeToString(gson.toJson(fcParams).getBytes(), Base64.URL_SAFE);
         AuthenticateIn authenticateIn = new AuthenticateIn(authenticationRequest.header.appID, null, finalChallenge);
 
+        List<AuthenticatorInfo> authenticatorInfos = parsePolicy(authenticationRequest.policy);
+        StatLog.printLog(TAG, "client auth parse policy: " + gson.toJson(authenticatorInfos));
+        if (authenticatorInfos == null || authenticatorInfos.isEmpty()) {
+            return null;
+        }
+
         ASMRequest<AuthenticateIn> asmRequest = new ASMRequest<>();
         asmRequest.requestType = Request.Authenticate;
         asmRequest.args = authenticateIn;
         asmRequest.asmVersion = authenticationRequest.header.upv;
-        return  gson.toJson(asmRequest);
+        asmRequest.authenticatorIndex = authenticatorInfos.get(0).authenticatorIndex;
+        return gson.toJson(asmRequest);
     }
 
     @Override

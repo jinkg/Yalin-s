@@ -23,7 +23,7 @@ import org.json.JSONObject;
 /**
  * Created by YaLin on 2016/1/13.
  */
-public class ASMOperationActivity extends AppCompatActivity implements View.OnClickListener {
+public class ASMOperationActivity extends AppCompatActivity implements View.OnClickListener, ASMOperator.HandleResultCallback {
     private TextView tvInfo;
     private Button btnDo;
 
@@ -42,7 +42,8 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
 
         initView();
         initData();
-        showFingerprint();
+
+        processOp();
     }
 
     private void initView() {
@@ -74,48 +75,26 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
 
         if (OpType == Request.Deregister || OpType == Request.GetInfo) {
             btnDo.setEnabled(false);
-            String result = ASMOperator.parseMessage(null, message).handle();
-            Intent intent = ASMIntent.getASMOperationResultIntent(result);
-            setResult(RESULT_OK, intent);
-            finish();
+            ASMOperator.parseMessage(this, message, this).handle();
         }
-    }
-
-    private void showFingerprint() {
-        mFragment = new FingerprintAuthenticationDialogFragment();
-        mFragment.setStage(
-                FingerprintAuthenticationDialogFragment.Stage.FINGERPRINT);
-        mFragment.show(getFragmentManager(), ASMOperationActivity.class.getSimpleName());
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_do) {
-            showFingerprint();
+            processOp();
         }
     }
 
-    public void fingerprintComplete(String fingerId) {
-        processOp(fingerId);
+    private void processOp() {
+        ASMOperator.parseMessage(this, message, this).handle();
     }
 
-    private void processOp(String touchId) {
-        String result = ASMOperator.parseMessage(touchId, message).handle();
+    @Override
+    public void onHandleResult(String result) {
         Intent intent = ASMIntent.getASMOperationResultIntent(result);
         setResult(RESULT_OK, intent);
         finish();
-    }
-
-    void selectTouchId() {
-        final String[] ids = getResources().getStringArray(R.array.touch_ids);
-        new AlertDialog.Builder(this)
-                .setItems(ids,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                                int which) {
-                                processOp(ids[which]);
-                            }
-                        }).show();
     }
 }

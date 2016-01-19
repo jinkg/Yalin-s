@@ -22,18 +22,18 @@ import com.jin.fidoclient.asm.msg.obj.AuthenticateOut;
 
 public class AuthenticationRequestProcessor {
 
-    public AuthenticateOut processRequest(RegRecord regRecord, AuthenticateIn authenticateIn) {
+    public AuthenticateOut processRequest(RegRecord regRecord, AuthenticateIn authenticateIn, String assertionScheme) {
         AuthenticateOut authenticateOut = new AuthenticateOut();
         AuthAssertionBuilder builder = new AuthAssertionBuilder();
 
-        setAssertions(regRecord, authenticateOut, builder, authenticateIn.finalChallenge);
+        setAssertions(regRecord, authenticateOut, builder, authenticateIn.finalChallenge, assertionScheme);
         return authenticateOut;
     }
 
-    private void setAssertions(RegRecord regRecord, AuthenticateOut authenticateOut, AuthAssertionBuilder builder, String fcParams) {
+    private void setAssertions(RegRecord regRecord, AuthenticateOut authenticateOut, AuthAssertionBuilder builder, String fcParams, String assertionScheme) {
         try {
             authenticateOut.assertion = builder.getAssertions(regRecord, fcParams);
-            authenticateOut.assertionScheme = "UAFV1TLV";
+            authenticateOut.assertionScheme = assertionScheme;
         } catch (Exception e) {
             e.printStackTrace();
         }

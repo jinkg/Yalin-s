@@ -13,7 +13,6 @@ import com.jin.fidotest.data.User;
 
 public class MainActivity extends BaseLoadActivity implements OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int REQUEST_DISCOVER = 1;
     private TextView tvWelcome;
     private View rootCoordinator;
     private ViewStub vsNotLogin;

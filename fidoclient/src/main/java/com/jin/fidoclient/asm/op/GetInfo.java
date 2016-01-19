@@ -6,20 +6,24 @@ import com.jin.fidoclient.asm.authenticator.Simulator;
 import com.jin.fidoclient.asm.msg.ASMResponse;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.asm.msg.obj.GetInfoOut;
+import com.jin.fidoclient.utils.StatLog;
 
 /**
  * Created by YaLin on 2016/1/18.
  */
 public class GetInfo extends ASMOperator {
+    private static final String TAG = GetInfo.class.getSimpleName();
+
     @Override
-    public String handle() {
+    public void handle() {
+        StatLog.printLog(TAG, "asm getInfo");
         ASMResponse<GetInfoOut> response = new ASMResponse<>();
 
         GetInfoOut getInfoOut = new GetInfoOut();
         getInfoOut.Authenticators = getAvailableAuthenticator();
         response.responseData = getInfoOut;
         response.statusCode = StatusCode.UAF_ASM_STATUS_OK;
-        return gson.toJson(response);
+        gson.toJson(response);
     }
 
     private AuthenticatorInfo[] getAvailableAuthenticator() {

@@ -124,12 +124,10 @@ public class RegRecordActivity extends BaseLoadActivity implements RegRecordAdap
             } else if (requestCode == REQUEST_REG) {
                 Bundle bundle = data.getExtras();
                 String message = bundle.getString(UAFIntent.MESSAGE_KEY);
-                String componentName = bundle.getString(UAFIntent.COMPONENT_NAME_KEY);
 
                 Gson gson = new Gson();
                 UAFMessage uafMessage = gson.fromJson(message, UAFMessage.class);
                 RegistrationResponse[] registrationResponses = gson.fromJson(uafMessage.uafProtocolMessage, RegistrationResponse[].class);
-                Log.d(TAG, "reg ok message : " + message + " componentName : " + componentName);
                 finishReg(registrationResponses);
             }
         }

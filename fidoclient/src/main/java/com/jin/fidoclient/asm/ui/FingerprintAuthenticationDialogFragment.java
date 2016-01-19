@@ -38,6 +38,12 @@ import com.jin.fidoclient.asm.fingerprint.FingerprintUiHelper;
 public class FingerprintAuthenticationDialogFragment extends DialogFragment
         implements FingerprintUiHelper.Callback {
 
+    public interface FingerprintAuthenticationResultCallback {
+        void onAuthenticate(String fingerId);
+
+        void authenticateFailed();
+    }
+
     private Button mCancelButton;
     private View mFingerprintContent;
 
@@ -45,11 +51,16 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
 
     private FingerprintManager.CryptoObject mCryptoObject;
     private FingerprintUiHelper mFingerprintUiHelper;
-    private ASMOperationActivity mActivity;
+
+    private FingerprintAuthenticationResultCallback callback;
 
     FingerprintUiHelper.FingerprintUiHelperBuilder mFingerprintUiHelperBuilder;
 
     public FingerprintAuthenticationDialogFragment() {
+    }
+
+    public FingerprintAuthenticationDialogFragment(FingerprintAuthenticationResultCallback callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -111,7 +122,6 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = (ASMOperationActivity) activity;
     }
 
     /**
@@ -138,7 +148,9 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
     public void onAuthenticated() {
         // Callback from FingerprintUiHelper. Let the activity know that authentication was
         // successful.
-        mActivity.fingerprintComplete("finger 1");
+        if (callback != null) {
+            callback.onAuthenticate("finger 1");
+        }
         dismiss();
     }
 

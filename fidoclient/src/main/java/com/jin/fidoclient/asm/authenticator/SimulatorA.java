@@ -1,9 +1,11 @@
 package com.jin.fidoclient.asm.authenticator;
 
+import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.google.gson.Gson;
 import com.jin.fidoclient.api.UAFClientApi;
 import com.jin.fidoclient.asm.db.RegRecord;
 import com.jin.fidoclient.asm.db.UAFDBHelper;
@@ -12,10 +14,12 @@ import com.jin.fidoclient.asm.msg.obj.AuthenticateOut;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.asm.msg.obj.RegisterIn;
 import com.jin.fidoclient.asm.msg.obj.RegisterOut;
+import com.jin.fidoclient.asm.ui.FingerprintAuthenticationDialogFragment;
 import com.jin.fidoclient.client.AuthenticationRequestProcessor;
 import com.jin.fidoclient.client.RegistrationRequestProcessor;
 import com.jin.fidoclient.crypto.BCrypt;
 import com.jin.fidoclient.crypto.KeyCodec;
+import com.jin.fidoclient.utils.StatLog;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -25,11 +29,15 @@ import java.security.NoSuchProviderException;
 /**
  * Created by YaLin on 2016/1/18.
  */
-public class SimulatorA extends Simulator {
+public class SimulatorA extends Simulator implements FingerprintAuthenticationDialogFragment.FingerprintAuthenticationResultCallback {
+    private static final String TAG = SimulatorA.class.getSimpleName();
+
     public static final String AAID = "EBA0#0001";
     private static final String SIMULATOR_TYPE = "fingerprint";
+    private static final String ASSERTION_SCHEME = "UAFV1TLV";
 
     private static SimulatorA sInstance;
+    private BiometricsAuthResultCallback mCallback;
 
     private SimulatorA() {
     }
@@ -46,6 +54,7 @@ public class SimulatorA extends Simulator {
         if (TextUtils.isEmpty(biometricsId) || registerIn == null) {
             throw new IllegalArgumentException();
         }
+        StatLog.printLog(TAG, "simulatorA register biometricsId: " + biometricsId + " registerIn: " + new Gson().toJson(registerIn));
 
         UAFDBHelper dbHelper = UAFDBHelper.getInstance(UAFClientApi.getContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -53,6 +62,7 @@ public class SimulatorA extends Simulator {
             RegRecord regRecord = new RegRecord();
             regRecord.type = SIMULATOR_TYPE;
             regRecord.biometricsId = biometricsId;
+            regRecord.aaid = AAID;
             regRecord.keyId = getKeyId();
             regRecord.username = registerIn.username;
             regRecord.appId = registerIn.appID;
@@ -67,7 +77,7 @@ public class SimulatorA extends Simulator {
             regRecord.userPublicKey = Base64.encodeToString(keyPair.getPublic().getEncoded(), Base64.URL_SAFE);
 
             dbHelper.addRecord(db, regRecord);
-
+            StatLog.printLog(TAG, "simulatorA register success registerOut: " + new Gson().toJson(registerOut));
             return registerOut;
         }
 
@@ -76,6 +86,7 @@ public class SimulatorA extends Simulator {
 
     @Override
     public AuthenticateOut authenticate(String biometricsId, AuthenticateIn authenticateIn) {
+        StatLog.printLog(TAG, "simulatorA authenticate biometricsId: " + biometricsId + " authenticateIn: " + new Gson().toJson(authenticateIn));
         UAFDBHelper dbHelper = UAFDBHelper.getInstance(UAFClientApi.getContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         RegRecord regRecord = dbHelper.getUserRecord(db, biometricsId);
@@ -84,7 +95,9 @@ public class SimulatorA extends Simulator {
         }
 
         AuthenticationRequestProcessor p = new AuthenticationRequestProcessor();
-        return p.processRequest(regRecord, authenticateIn);
+        AuthenticateOut authenticateOut = p.processRequest(regRecord, authenticateIn, ASSERTION_SCHEME);
+        StatLog.printLog(TAG, "simulatorA authenticate success authenticateOut: " + new Gson().toJson(authenticateOut));
+        return authenticateOut;
     }
 
     @Override
@@ -104,7 +117,7 @@ public class SimulatorA extends Simulator {
         attestationTypes[1] = TAG_ATTESTATION_BASIC_FULL;
         authenticatorInfo.hasSettings(false)
                 .aaid(AAID)
-                .assertionScheme("UAFV1TLV")
+                .assertionScheme(ASSERTION_SCHEME)
                 .authenticationAlgorithm(UAF_ALG_SIGN_SECP256R1_ECDSA_SHA256_RAW)
                 .attestationTypes(attestationTypes)
                 .userVerification(USER_VERIFY_FINGERPRINT)
@@ -118,4 +131,27 @@ public class SimulatorA extends Simulator {
         return authenticatorInfo;
     }
 
+
+    @Override
+    public void showBiometricsAuth(Activity activity, BiometricsAuthResultCallback callback) {
+        mCallback = callback;
+        FingerprintAuthenticationDialogFragment fragment = new FingerprintAuthenticationDialogFragment(this);
+        fragment.setStage(
+                FingerprintAuthenticationDialogFragment.Stage.FINGERPRINT);
+        fragment.show(activity.getFragmentManager(), activity.getClass().getSimpleName());
+    }
+
+    @Override
+    public void onAuthenticate(String fingerId) {
+        if (mCallback != null) {
+            mCallback.onAuthSuccess(this, fingerId);
+        }
+    }
+
+    @Override
+    public void authenticateFailed() {
+        if (mCallback != null) {
+            mCallback.onAuthFailed(this);
+        }
+    }
 }

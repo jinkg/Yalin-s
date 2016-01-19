@@ -103,7 +103,6 @@ public class FIDOOperationActivity extends AppCompatActivity implements View.OnC
             return;
         }
         processMessage(message);
-
     }
 
     private void processMessage(String inUafOperationMsg) {
@@ -115,10 +114,6 @@ public class FIDOOperationActivity extends AppCompatActivity implements View.OnC
         } else {
 
         }
-    }
-
-    private void checkPolicy(String uafMessage) {
-
     }
 
     private String extract(String inMsg) {

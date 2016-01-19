@@ -9,6 +9,7 @@ import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.ASMResponse;
 import com.jin.fidoclient.asm.msg.Request;
+import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.asm.msg.obj.RegisterIn;
 import com.jin.fidoclient.asm.msg.obj.RegisterOut;
 import com.jin.fidoclient.msg.AuthenticatorRegistrationAssertion;
@@ -17,10 +18,14 @@ import com.jin.fidoclient.msg.FinalChallengeParams;
 import com.jin.fidoclient.msg.OperationHeader;
 import com.jin.fidoclient.msg.RegistrationRequest;
 import com.jin.fidoclient.msg.RegistrationResponse;
+import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidoclient.utils.Utils;
+
+import java.util.List;
 
 
 public class Reg extends ASMMessageHandler {
+    private static final String TAG = Reg.class.getSimpleName();
     private final RegistrationRequest registrationRequest;
     private final Context context;
     private final ChannelBinding channelBinding;
@@ -61,10 +66,17 @@ public class Reg extends ASMMessageHandler {
         finalChallenge = Base64.encodeToString(gson.toJson(fcParams).getBytes(), Base64.URL_SAFE);
         RegisterIn registerIn = new RegisterIn(registrationRequest.header.appID, registrationRequest.username, finalChallenge, 0);
 
+        List<AuthenticatorInfo> authenticatorInfos = parsePolicy(registrationRequest.policy);
+        StatLog.printLog(TAG, "client reg parse policy: " + gson.toJson(authenticatorInfos));
+        if (authenticatorInfos == null || authenticatorInfos.isEmpty()) {
+            return null;
+        }
+
         ASMRequest<RegisterIn> asmRequest = new ASMRequest<>();
         asmRequest.requestType = Request.Register;
         asmRequest.args = registerIn;
         asmRequest.asmVersion = registrationRequest.header.upv;
+        asmRequest.authenticatorIndex = authenticatorInfos.get(0).authenticatorIndex;
         return gson.toJson(asmRequest);
     }
 
