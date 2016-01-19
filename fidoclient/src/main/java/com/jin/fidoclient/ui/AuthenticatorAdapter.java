@@ -47,7 +47,7 @@ public class AuthenticatorAdapter extends RecyclerView.Adapter<AuthenticatorItem
         holder.tvTitle.setText(info.title);
         if (TextUtils.isEmpty(info.icon)) {
             if (info.iconRes <= 0) {
-                info.iconRes = R.drawable.ic_photo_camera_black_24dp;
+                info.iconRes = R.drawable.ic_linked_camera_black_48dp;
                 Drawable drawable = mContext.getDrawable(info.iconRes);
                 drawable.setTint(mContext.getColor(R.color.hint_color));
                 holder.ivIcon.setImageDrawable(drawable);
