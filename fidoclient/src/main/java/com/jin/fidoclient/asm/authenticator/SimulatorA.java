@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.google.gson.Gson;
+import com.jin.fidoclient.R;
 import com.jin.fidoclient.api.UAFClientApi;
 import com.jin.fidoclient.asm.db.RegRecord;
 import com.jin.fidoclient.asm.db.UAFDBHelper;
@@ -127,6 +128,9 @@ public class SimulatorA extends Simulator implements FingerprintAuthenticationDi
                 .isSecondFactorOnly(false)
                 .isRoamingAuthenticator(false)
                 .tcDisplay(TRANSACTION_CONFIRMATION_DISPLAY_PRIVILEGED_SOFTWARE);
+
+        authenticatorInfo.title = SIMULATOR_TYPE;
+        authenticatorInfo.iconRes = R.drawable.ic_fp_40px;
 
         return authenticatorInfo;
     }

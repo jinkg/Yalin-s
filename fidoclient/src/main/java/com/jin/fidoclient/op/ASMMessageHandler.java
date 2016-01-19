@@ -1,6 +1,5 @@
 package com.jin.fidoclient.op;
 
-import android.content.Context;
 
 import com.google.gson.Gson;
 import com.jin.fidoclient.asm.authenticator.Simulator;
@@ -9,6 +8,7 @@ import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.msg.MatchCriteria;
 import com.jin.fidoclient.msg.Policy;
 import com.jin.fidoclient.msg.client.UAFIntentType;
+import com.jin.fidoclient.ui.FIDOOperationActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,28 +17,31 @@ import java.util.List;
  * Created by YaLin on 2016/1/11.
  */
 public abstract class ASMMessageHandler {
+    public interface HandleResultCallback {
+        void onResult(String result);
+    }
+
     public static final String REG_TAG = "\"Reg\"";
     public static final String AUTH_TAG = "\"Auth\"";
     public static final String DEREG_TAG = "\"Dereg\"";
 
     protected final Gson gson = new Gson();
 
-    public static ASMMessageHandler parseMessage(Context context, String intentType, String uafMessage, String channelBinding) {
+    public static ASMMessageHandler parseMessage(FIDOOperationActivity activity, String intentType, String uafMessage, String channelBinding, HandleResultCallback callback) {
         if (UAFIntentType.UAF_OPERATION.name().equals(intentType)) {
             if (uafMessage.contains(REG_TAG)) {
-                return new Reg(context, uafMessage, channelBinding);
+                return new Reg(activity, uafMessage, channelBinding, callback);
             } else if (uafMessage.contains(AUTH_TAG)) {
-                return new Auth(context, uafMessage, channelBinding);
+                return new Auth(activity, uafMessage, channelBinding, callback);
             } else if (uafMessage.contains(DEREG_TAG)) {
-                return new Dereg(context, uafMessage);
+                return new Dereg( uafMessage, callback);
             }
         } else if (UAFIntentType.CHECK_POLICY.name().equals(intentType)) {
-            return new CheckPolicy(context, uafMessage);
+            return new CheckPolicy(activity, uafMessage);
         }
         return new ASMMessageHandler() {
             @Override
-            public String generateAsmRequest() {
-                return null;
+            public void handle() {
             }
 
             @Override
@@ -48,7 +51,7 @@ public abstract class ASMMessageHandler {
         };
     }
 
-    public abstract String generateAsmRequest();
+    public abstract void handle();
 
     public abstract String parseAsmResponse(String asmResponseMsg) throws ASMException;
 

@@ -16,11 +16,9 @@
 package com.jin.fidoclient.op;
 
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.google.gson.Gson;
 import com.jin.fidoclient.asm.api.StatusCode;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
@@ -35,21 +33,24 @@ import com.jin.fidoclient.msg.AuthenticatorSignAssertion;
 import com.jin.fidoclient.msg.ChannelBinding;
 import com.jin.fidoclient.msg.FinalChallengeParams;
 import com.jin.fidoclient.msg.OperationHeader;
+import com.jin.fidoclient.ui.AuthenticatorAdapter;
+import com.jin.fidoclient.ui.FIDOOperationActivity;
 import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidoclient.utils.Utils;
 
 import java.util.List;
 
-public class Auth extends ASMMessageHandler {
+public class Auth extends ASMMessageHandler implements AuthenticatorAdapter.OnAuthenticatorClickCallback {
     private static final String TAG = Auth.class.getSimpleName();
     private final AuthenticationRequest authenticationRequest;
-    private final Context activity;
+    private final FIDOOperationActivity activity;
     private final ChannelBinding channelBinding;
+    private final HandleResultCallback callback;
 
     private String finalChallenge;
 
-    public Auth(Context context, String message, String channelBinding) {
-        this.activity = context;
+    public Auth(FIDOOperationActivity activity, String message, String channelBinding, HandleResultCallback callback) {
+        this.activity = activity;
         try {
             authenticationRequest = getAuthRequest(message);
         } catch (Exception e) {
@@ -62,36 +63,17 @@ public class Auth extends ASMMessageHandler {
             cb = null;
         }
         this.channelBinding = cb;
+        this.callback = callback;
     }
 
     @Override
-    public String generateAsmRequest() {
-        String facetId = Utils.getFacetId(activity);
-        if (TextUtils.isEmpty(authenticationRequest.header.appID)) {
-            authenticationRequest.header.appID = facetId;
-        }
-
-        FinalChallengeParams fcParams = new FinalChallengeParams();
-        fcParams.appID = authenticationRequest.header.appID;
-        fcParams.challenge = authenticationRequest.challenge;
-        fcParams.facetID = facetId;
-        fcParams.channelBinding = channelBinding;
-
-        finalChallenge = Base64.encodeToString(gson.toJson(fcParams).getBytes(), Base64.URL_SAFE);
-        AuthenticateIn authenticateIn = new AuthenticateIn(authenticationRequest.header.appID, null, finalChallenge);
-
+    public void handle() {
         List<AuthenticatorInfo> authenticatorInfos = parsePolicy(authenticationRequest.policy);
         StatLog.printLog(TAG, "client auth parse policy: " + gson.toJson(authenticatorInfos));
         if (authenticatorInfos == null || authenticatorInfos.isEmpty()) {
-            return null;
+            return;
         }
-
-        ASMRequest<AuthenticateIn> asmRequest = new ASMRequest<>();
-        asmRequest.requestType = Request.Authenticate;
-        asmRequest.args = authenticateIn;
-        asmRequest.asmVersion = authenticationRequest.header.upv;
-        asmRequest.authenticatorIndex = authenticatorInfos.get(0).authenticatorIndex;
-        return gson.toJson(asmRequest);
+        activity.showAuthenticator(authenticatorInfos, this);
     }
 
     @Override
@@ -129,5 +111,31 @@ public class Auth extends ASMMessageHandler {
 
     public AuthenticationRequest getAuthRequest(String uafMsg) {
         return gson.fromJson(uafMsg, AuthenticationRequest[].class)[0];
+    }
+
+    @Override
+    public void onAuthenticatorClick(AuthenticatorInfo info) {
+        String facetId = Utils.getFacetId(activity.getApplication());
+        if (TextUtils.isEmpty(authenticationRequest.header.appID)) {
+            authenticationRequest.header.appID = facetId;
+        }
+
+        FinalChallengeParams fcParams = new FinalChallengeParams();
+        fcParams.appID = authenticationRequest.header.appID;
+        fcParams.challenge = authenticationRequest.challenge;
+        fcParams.facetID = facetId;
+        fcParams.channelBinding = channelBinding;
+
+        finalChallenge = Base64.encodeToString(gson.toJson(fcParams).getBytes(), Base64.URL_SAFE);
+        AuthenticateIn authenticateIn = new AuthenticateIn(authenticationRequest.header.appID, null, finalChallenge);
+
+        ASMRequest<AuthenticateIn> asmRequest = new ASMRequest<>();
+        asmRequest.requestType = Request.Authenticate;
+        asmRequest.args = authenticateIn;
+        asmRequest.asmVersion = authenticationRequest.header.upv;
+        asmRequest.authenticatorIndex = info.authenticatorIndex;
+        if (callback != null) {
+            callback.onResult(gson.toJson(asmRequest));
+        }
     }
 }

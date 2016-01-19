@@ -22,9 +22,14 @@
     <string name="fingerprint_success">Fingerprint recognized</string>
 
     <string name="cancel">Cancel</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="sign_in">Sign in</string>
     <string name="fingerprint_description">Confirm fingerprint to continue</string>
 
     <string name="message_error">error: uaf message is empty</string>
+    <string name="unknown_device">unknown device</string>
+    <string name="select_device_type">All available device are present below,
+        select a device to complete the operator.</string>
+
+    <string name="biometrics_auth">Input your biometrics to identify your identity.</string>
 </resources>

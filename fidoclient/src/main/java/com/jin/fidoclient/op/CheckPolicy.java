@@ -27,10 +27,10 @@ public class CheckPolicy extends ASMMessageHandler {
     }
 
     @Override
-    public String generateAsmRequest() {
+    public void handle() {
         ASMRequest asmRequest = new ASMRequest();
         asmRequest.requestType = Request.GetInfo;
-        return gson.toJson(asmRequest);
+        gson.toJson(asmRequest);
     }
 
     @Override

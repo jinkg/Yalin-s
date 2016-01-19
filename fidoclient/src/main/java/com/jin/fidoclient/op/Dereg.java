@@ -16,7 +16,6 @@
 
 package com.jin.fidoclient.op;
 
-import android.content.Context;
 
 import com.google.gson.Gson;
 import com.jin.fidoclient.asm.msg.ASMRequest;
@@ -32,16 +31,16 @@ public class Dereg extends ASMMessageHandler {
 
     private Gson gson = new Gson();
 
-    private DeregistrationRequest deregistrationRequest;
-    private Context context;
+    private final DeregistrationRequest deregistrationRequest;
+    private final HandleResultCallback callback;
 
-    public Dereg(Context context, String message) {
-        this.context = context;
+    public Dereg(String message, HandleResultCallback callback) {
         this.deregistrationRequest = getDeregistrationRequest(message);
+        this.callback = callback;
     }
 
     @Override
-    public String generateAsmRequest() {
+    public void handle() {
         try {
             DeregisterIn deregisterIn = new DeregisterIn(deregistrationRequest.header.appID, deregistrationRequest.authenticators[0].keyID);
 
@@ -49,10 +48,11 @@ public class Dereg extends ASMMessageHandler {
             asmRequest.requestType = Request.Deregister;
             asmRequest.args = deregisterIn;
             asmRequest.asmVersion = deregistrationRequest.header.upv;
-            return gson.toJson(asmRequest);
+            if (callback != null) {
+                callback.onResult(gson.toJson(asmRequest));
+            }
         } catch (Exception e) {
             StatLog.printLog(TAG, "generate dereg asm request error. error is:" + e.getMessage());
-            return null;
         }
     }
 

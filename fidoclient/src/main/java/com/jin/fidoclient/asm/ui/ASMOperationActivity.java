@@ -1,10 +1,8 @@
 package com.jin.fidoclient.asm.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -31,8 +29,6 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
 
     private Request OpType;
 
-    private FingerprintAuthenticationDialogFragment mFragment;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +43,7 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void initView() {
-        tvInfo = (TextView) findViewById(R.id.tv_info);
+        tvInfo = (TextView) findViewById(R.id.tv_prompt);
         btnDo = (Button) findViewById(R.id.btn_do);
         btnDo.setOnClickListener(this);
     }

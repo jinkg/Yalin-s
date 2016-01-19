@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -14,21 +16,24 @@ import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.api.ASMIntent;
 import com.jin.fidoclient.asm.exceptions.ASMException;
+import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.msg.client.UAFIntentType;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.op.ASMMessageHandler;
+
+import java.util.List;
 
 
 /**
  * Created by YaLin on 2015/10/21.
  */
-public class FIDOOperationActivity extends AppCompatActivity implements View.OnClickListener {
+public class FIDOOperationActivity extends AppCompatActivity implements ASMMessageHandler.HandleResultCallback {
     private static final String TAG = FIDOOperationActivity.class.getSimpleName();
     public static final int REQUEST_ASM_OPERATION = 1;
 
-    private TextView tvOperation;
-    private TextView tvUafMsg;
     private View coordinator;
+    private TextView tvInfo;
+    private RecyclerView rvAuthenticators;
 
     private String intentType;
     private String message;
@@ -51,23 +56,13 @@ public class FIDOOperationActivity extends AppCompatActivity implements View.OnC
     }
 
     void findView() {
-        tvOperation = (TextView) findViewById(R.id.textViewOperation);
-        tvUafMsg = (TextView) findViewById(R.id.textViewOpMsg);
-        findViewById(R.id.btn_confirm).setOnClickListener(this);
+        rvAuthenticators = (RecyclerView) findViewById(R.id.rv_authenticators);
         coordinator = findViewById(R.id.root_coordinator);
+        rvAuthenticators.setLayoutManager(new GridLayoutManager(this, 2));
+        tvInfo = (TextView) findViewById(R.id.tv_prompt);
     }
 
     void initData() {
-        tvOperation.setText(intentType);
-        tvUafMsg.setText(message);
-    }
-
-    @Override
-    public void onClick(View v) {
-        int i = v.getId();
-        if (i == R.id.btn_confirm) {
-            doConfirm();
-        }
     }
 
     @Override
@@ -107,13 +102,8 @@ public class FIDOOperationActivity extends AppCompatActivity implements View.OnC
 
     private void processMessage(String inUafOperationMsg) {
         String inMsg = extract(inUafOperationMsg);
-        asmMessageHandler = ASMMessageHandler.parseMessage(this, intentType, inMsg, channelBinding);
-        String asmRequest = asmMessageHandler.generateAsmRequest();
-        if (asmRequest != null) {
-            ASMApi.doOperation(this, REQUEST_ASM_OPERATION, asmRequest);
-        } else {
-
-        }
+        asmMessageHandler = ASMMessageHandler.parseMessage(this, intentType, inMsg, channelBinding, this);
+        asmMessageHandler.handle();
     }
 
     private String extract(String inMsg) {
@@ -123,6 +113,21 @@ public class FIDOOperationActivity extends AppCompatActivity implements View.OnC
     }
 
     private void showError(int errorId) {
-        tvOperation.setText(errorId);
+        tvInfo.setText(errorId);
     }
+
+    @Override
+    public void onResult(String asmRequest) {
+        if (asmRequest != null) {
+            ASMApi.doOperation(this, REQUEST_ASM_OPERATION, asmRequest);
+        } else {
+
+        }
+    }
+
+    public void showAuthenticator(List<AuthenticatorInfo> infos, AuthenticatorAdapter.OnAuthenticatorClickCallback callback) {
+        AuthenticatorAdapter adapter = new AuthenticatorAdapter(this, infos, callback);
+        rvAuthenticators.setAdapter(adapter);
+    }
+
 }

@@ -16,6 +16,7 @@
 
 package com.jin.fidoclient.asm.msg.obj;
 
+import com.jin.fidoclient.msg.DisplayPNGCharacteristicsDescriptor;
 import com.jin.fidoclient.msg.Version;
 
 public class AuthenticatorInfo {
@@ -35,6 +36,14 @@ public class AuthenticatorInfo {
     public boolean isRoamingAuthenticator;
     public String[] supportedExtensionIDs;
     public int tcDisplay;
+
+    public String tcDisplayContentType;
+    public DisplayPNGCharacteristicsDescriptor[] tcDisplayPNGCharacteristics;
+    public String title;
+    public String description;
+    public String icon;
+
+    public int iconRes;
 
     public AuthenticatorInfo authenticatorIndex(int authenticatorIndex) {
         this.authenticatorIndex = authenticatorIndex;

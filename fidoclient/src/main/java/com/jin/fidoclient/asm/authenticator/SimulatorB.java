@@ -33,7 +33,7 @@ import java.security.NoSuchProviderException;
  */
 public class SimulatorB extends Simulator {
     private static final String TAG = SimulatorB.class.getSimpleName();
-    public static final String AAID = "EBA0#0002";
+    public static final String AAID = "0015#0001";
     private static final String SIMULATOR_TYPE = "face";
     private static final String ASSERTION_SCHEME = "UAFV1TLV";
 
@@ -126,6 +126,7 @@ public class SimulatorB extends Simulator {
                 .isSecondFactorOnly(false)
                 .isRoamingAuthenticator(false)
                 .tcDisplay(TRANSACTION_CONFIRMATION_DISPLAY_PRIVILEGED_SOFTWARE);
+        authenticatorInfo.title = SIMULATOR_TYPE;
 
         return authenticatorInfo;
     }

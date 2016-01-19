@@ -1,6 +1,5 @@
 package com.jin.fidoclient.op;
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -18,25 +17,29 @@ import com.jin.fidoclient.msg.FinalChallengeParams;
 import com.jin.fidoclient.msg.OperationHeader;
 import com.jin.fidoclient.msg.RegistrationRequest;
 import com.jin.fidoclient.msg.RegistrationResponse;
+import com.jin.fidoclient.ui.AuthenticatorAdapter;
+import com.jin.fidoclient.ui.FIDOOperationActivity;
 import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidoclient.utils.Utils;
 
 import java.util.List;
 
 
-public class Reg extends ASMMessageHandler {
+public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAuthenticatorClickCallback {
     private static final String TAG = Reg.class.getSimpleName();
     private final RegistrationRequest registrationRequest;
-    private final Context context;
+    private final FIDOOperationActivity activity;
     private final ChannelBinding channelBinding;
+    private final HandleResultCallback callback;
 
     private String finalChallenge;
 
-    public Reg(Context context, String message, String channelBinding) {
+
+    public Reg(FIDOOperationActivity activity, String message, String channelBinding, HandleResultCallback callback) {
         if (TextUtils.isEmpty(message)) {
             throw new IllegalArgumentException();
         }
-        this.context = context;
+        this.activity = activity;
         try {
             this.registrationRequest = getRegistrationRequest(message);
         } catch (Exception e) {
@@ -49,35 +52,19 @@ public class Reg extends ASMMessageHandler {
             cb = null;
         }
         this.channelBinding = cb;
+        this.callback = callback;
     }
 
     @Override
-    public String generateAsmRequest() {
-        String facetId = Utils.getFacetId(context);
-        if (TextUtils.isEmpty(registrationRequest.header.appID)) {
-            registrationRequest.header.appID = facetId;
-        }
-        FinalChallengeParams fcParams = new FinalChallengeParams();
-        fcParams.appID = registrationRequest.header.appID;
-        fcParams.challenge = registrationRequest.challenge;
-        fcParams.facetID = facetId;
-        fcParams.channelBinding = channelBinding;
-
-        finalChallenge = Base64.encodeToString(gson.toJson(fcParams).getBytes(), Base64.URL_SAFE);
-        RegisterIn registerIn = new RegisterIn(registrationRequest.header.appID, registrationRequest.username, finalChallenge, 0);
-
+    public void handle() {
         List<AuthenticatorInfo> authenticatorInfos = parsePolicy(registrationRequest.policy);
         StatLog.printLog(TAG, "client reg parse policy: " + gson.toJson(authenticatorInfos));
         if (authenticatorInfos == null || authenticatorInfos.isEmpty()) {
-            return null;
+            return;
         }
+        activity.showAuthenticator(authenticatorInfos, this);
 
-        ASMRequest<RegisterIn> asmRequest = new ASMRequest<>();
-        asmRequest.requestType = Request.Register;
-        asmRequest.args = registerIn;
-        asmRequest.asmVersion = registrationRequest.header.upv;
-        asmRequest.authenticatorIndex = authenticatorInfos.get(0).authenticatorIndex;
-        return gson.toJson(asmRequest);
+
     }
 
     @Override
@@ -116,5 +103,30 @@ public class Reg extends ASMMessageHandler {
     private RegistrationRequest getRegistrationRequest(String uafMsg) {
         RegistrationRequest[] requests = gson.fromJson(uafMsg, RegistrationRequest[].class);
         return requests[0];
+    }
+
+    @Override
+    public void onAuthenticatorClick(AuthenticatorInfo info) {
+        String facetId = Utils.getFacetId(activity.getApplication());
+        if (TextUtils.isEmpty(registrationRequest.header.appID)) {
+            registrationRequest.header.appID = facetId;
+        }
+        FinalChallengeParams fcParams = new FinalChallengeParams();
+        fcParams.appID = registrationRequest.header.appID;
+        fcParams.challenge = registrationRequest.challenge;
+        fcParams.facetID = facetId;
+        fcParams.channelBinding = channelBinding;
+
+        finalChallenge = Base64.encodeToString(gson.toJson(fcParams).getBytes(), Base64.URL_SAFE);
+        RegisterIn registerIn = new RegisterIn(registrationRequest.header.appID, registrationRequest.username, finalChallenge, 0);
+
+        ASMRequest<RegisterIn> asmRequest = new ASMRequest<>();
+        asmRequest.requestType = Request.Register;
+        asmRequest.args = registerIn;
+        asmRequest.asmVersion = registrationRequest.header.upv;
+        asmRequest.authenticatorIndex = info.authenticatorIndex;
+        if (callback != null) {
+            callback.onResult(gson.toJson(asmRequest));
+        }
     }
 }
