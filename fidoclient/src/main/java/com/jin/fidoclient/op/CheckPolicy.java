@@ -7,7 +7,7 @@ import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.msg.Policy;
 import com.jin.fidoclient.msg.RegistrationRequest;
-import com.jin.fidoclient.ui.FIDOOperationActivity;
+import com.jin.fidoclient.ui.UAFClientActivity;
 
 /**
  * Created by YaLin on 2016/1/18.
@@ -15,7 +15,7 @@ import com.jin.fidoclient.ui.FIDOOperationActivity;
 public class CheckPolicy extends ASMMessageHandler {
     private Policy policy;
 
-    public CheckPolicy(FIDOOperationActivity activity, String message) {
+    public CheckPolicy(UAFClientActivity activity, String message) {
         super(activity);
         try {
             RegistrationRequest registrationRequest = getRegistrationRequest(message);

@@ -3,7 +3,6 @@ package com.jin.fidoclient.op;
 
 import com.google.gson.Gson;
 import com.jin.fidoclient.asm.api.StatusCode;
-import com.jin.fidoclient.asm.authenticator.Simulator;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.ASMResponse;
@@ -17,7 +16,7 @@ import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.msg.client.UAFIntentType;
 import com.jin.fidoclient.op.traffic.Traffic;
 import com.jin.fidoclient.ui.AuthenticatorAdapter;
-import com.jin.fidoclient.ui.FIDOOperationActivity;
+import com.jin.fidoclient.ui.UAFClientActivity;
 import com.jin.fidoclient.utils.StatLog;
 
 import java.util.ArrayList;
@@ -40,9 +39,9 @@ public abstract class ASMMessageHandler {
 
     protected Traffic.OpStat mCurrentState = Traffic.OpStat.PREPARE;
 
-    protected final FIDOOperationActivity activity;
+    protected final UAFClientActivity activity;
 
-    public static ASMMessageHandler parseMessage(FIDOOperationActivity activity, String intentType, String uafMessage, String channelBinding) {
+    public static ASMMessageHandler parseMessage(UAFClientActivity activity, String intentType, String uafMessage, String channelBinding) {
         if (UAFIntentType.UAF_OPERATION.name().equals(intentType)) {
             if (uafMessage.contains(REG_TAG)) {
                 return new Reg(activity, uafMessage, channelBinding);
@@ -69,7 +68,7 @@ public abstract class ASMMessageHandler {
         };
     }
 
-    public ASMMessageHandler(FIDOOperationActivity activity) {
+    public ASMMessageHandler(UAFClientActivity activity) {
         this.activity = activity;
     }
 

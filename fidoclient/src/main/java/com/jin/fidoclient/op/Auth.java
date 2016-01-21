@@ -43,7 +43,7 @@ import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.op.traffic.Traffic;
 import com.jin.fidoclient.ui.AuthenticatorAdapter;
-import com.jin.fidoclient.ui.FIDOOperationActivity;
+import com.jin.fidoclient.ui.UAFClientActivity;
 import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidoclient.utils.Utils;
 
@@ -54,7 +54,7 @@ public class Auth extends ASMMessageHandler implements AuthenticatorAdapter.OnAu
 
     private String finalChallenge;
 
-    public Auth(FIDOOperationActivity activity, String message, String channelBinding) {
+    public Auth(UAFClientActivity activity, String message, String channelBinding) {
         super(activity);
         try {
             authenticationRequest = getAuthRequest(message);

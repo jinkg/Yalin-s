@@ -15,7 +15,7 @@ import com.jin.fidoclient.msg.Authenticator;
 import com.jin.fidoclient.msg.DiscoverData;
 import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.op.traffic.Traffic;
-import com.jin.fidoclient.ui.FIDOOperationActivity;
+import com.jin.fidoclient.ui.UAFClientActivity;
 import com.jin.fidoclient.utils.StatLog;
 
 /**
@@ -24,7 +24,7 @@ import com.jin.fidoclient.utils.StatLog;
 public class Discover extends ASMMessageHandler {
     private static final String TAG = Discover.class.getSimpleName();
 
-    public Discover(FIDOOperationActivity activity) {
+    public Discover(UAFClientActivity activity) {
         super(activity);
         updateState(Traffic.OpStat.PREPARE);
     }

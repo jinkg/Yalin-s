@@ -31,7 +31,7 @@ import com.jin.fidoclient.msg.DeregResponse;
 import com.jin.fidoclient.msg.DeregistrationRequest;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.op.traffic.Traffic;
-import com.jin.fidoclient.ui.FIDOOperationActivity;
+import com.jin.fidoclient.ui.UAFClientActivity;
 import com.jin.fidoclient.utils.StatLog;
 
 
@@ -42,7 +42,7 @@ public class Dereg extends ASMMessageHandler {
 
     private final DeregistrationRequest deregistrationRequest;
 
-    public Dereg(FIDOOperationActivity activity, String message) {
+    public Dereg(UAFClientActivity activity, String message) {
         super(activity);
         updateState(Traffic.OpStat.PREPARE);
         this.deregistrationRequest = getDeregistrationRequest(message);

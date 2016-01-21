@@ -11,12 +11,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jin.fidoclient.R;
-import com.jin.fidoclient.api.UAFClientError;
 import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidoclient.asm.api.ASMIntent;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
-import com.jin.fidoclient.msg.client.UAFIntentType;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.op.ASMMessageHandler;
 import com.jin.fidoclient.utils.StatLog;
@@ -27,8 +25,8 @@ import java.util.List;
 /**
  * Created by YaLin on 2015/10/21.
  */
-public class FIDOOperationActivity extends AppCompatActivity {
-    private static final String TAG = FIDOOperationActivity.class.getSimpleName();
+public class UAFClientActivity extends AppCompatActivity {
+    private static final String TAG = UAFClientActivity.class.getSimpleName();
 
     private View coordinator;
     private TextView tvInfo;
@@ -108,18 +106,6 @@ public class FIDOOperationActivity extends AppCompatActivity {
 
     private void showError(int errorId) {
         tvInfo.setText(errorId);
-    }
-
-    public void onClientHandleResult(String result) {
-        StatLog.printLog(TAG, "client prepare result:" + result);
-        Intent intent = null;
-        if (UAFIntentType.DISCOVER.name().equals(intentType)) {
-            intent = UAFIntent.getDiscoverResultIntent(result, getComponentName().flattenToString(), UAFClientError.NO_ERROR);
-        }
-        if (intent != null) {
-            setResult(RESULT_OK, intent);
-            finish();
-        }
     }
 
     @Override
