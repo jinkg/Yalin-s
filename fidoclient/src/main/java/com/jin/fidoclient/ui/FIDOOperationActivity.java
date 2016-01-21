@@ -13,13 +13,13 @@ import android.widget.TextView;
 import com.jin.fidoclient.R;
 import com.jin.fidoclient.api.UAFClientError;
 import com.jin.fidoclient.api.UAFIntent;
-import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.api.ASMIntent;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.msg.client.UAFIntentType;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.op.ASMMessageHandler;
+import com.jin.fidoclient.utils.StatLog;
 
 import java.util.List;
 
@@ -27,9 +27,8 @@ import java.util.List;
 /**
  * Created by YaLin on 2015/10/21.
  */
-public class FIDOOperationActivity extends AppCompatActivity implements ASMMessageHandler.HandleResultCallback {
+public class FIDOOperationActivity extends AppCompatActivity {
     private static final String TAG = FIDOOperationActivity.class.getSimpleName();
-    public static final int REQUEST_ASM_OPERATION = 1;
 
     private View coordinator;
     private TextView tvInfo;
@@ -49,6 +48,8 @@ public class FIDOOperationActivity extends AppCompatActivity implements ASMMessa
         intentType = extras.getString(UAFIntent.UAF_INTENT_TYPE_KEY);
         message = extras.getString(UAFIntent.MESSAGE_KEY);
         channelBinding = extras.getString(UAFIntent.CHANNEL_BINDINGS_KEY);
+        StatLog.printLog(TAG, "onCreate intentType:" + intentType + " message:" + message + " channelBinding:" + channelBinding);
+
         findView();
         initData();
 
@@ -69,21 +70,10 @@ public class FIDOOperationActivity extends AppCompatActivity implements ASMMessa
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_ASM_OPERATION) {
+            if (requestCode == ASMMessageHandler.REQUEST_ASM_OPERATION) {
                 String resultStr = data.getExtras().getString(ASMIntent.MESSAGE_KEY);
-                String response;
                 try {
-                    response = asmMessageHandler.parseAsmResponse(resultStr);
-                    Intent intent = null;
-                    if (UAFIntentType.UAF_OPERATION.name().equals(intentType)) {
-                        intent = UAFIntent.getUAFOperationResultIntent(getComponentName().flattenToString(), UAFClientError.NO_ERROR, new UAFMessage(response).toJson());
-                    } else if (UAFIntentType.CHECK_POLICY.name().equals(intentType)) {
-                        intent = UAFIntent.getCheckPolicyResultIntent(getComponentName().flattenToString(), UAFClientError.NO_ERROR);
-                    }
-                    if (intent != null) {
-                        setResult(RESULT_OK, intent);
-                        finish();
-                    }
+                    asmMessageHandler.traffic(resultStr);
                 } catch (ASMException e) {
                     Snackbar.make(coordinator, ASMException.class.getSimpleName() + ":" + e.statusCode, Snackbar.LENGTH_SHORT)
                             .show();
@@ -101,9 +91,13 @@ public class FIDOOperationActivity extends AppCompatActivity implements ASMMessa
     }
 
     private void processMessage(String inUafOperationMsg) {
+        StatLog.printLog(TAG, "process message:" + inUafOperationMsg);
         String inMsg = extract(inUafOperationMsg);
-        asmMessageHandler = ASMMessageHandler.parseMessage(this, intentType, inMsg, channelBinding, this);
-        asmMessageHandler.handle();
+        StatLog.printLog(TAG, "extract message is:" + inMsg);
+        asmMessageHandler = ASMMessageHandler.parseMessage(this, intentType, inMsg, channelBinding);
+        if (!asmMessageHandler.startTraffic()) {
+            showError(R.string.handle_error);
+        }
     }
 
     private String extract(String inMsg) {
@@ -116,18 +110,26 @@ public class FIDOOperationActivity extends AppCompatActivity implements ASMMessa
         tvInfo.setText(errorId);
     }
 
-    @Override
-    public void onResult(String asmRequest) {
-        if (asmRequest != null) {
-            ASMApi.doOperation(this, REQUEST_ASM_OPERATION, asmRequest);
-        } else {
-
+    public void onClientHandleResult(String result) {
+        StatLog.printLog(TAG, "client prepare result:" + result);
+        Intent intent = null;
+        if (UAFIntentType.DISCOVER.name().equals(intentType)) {
+            intent = UAFIntent.getDiscoverResultIntent(result, getComponentName().flattenToString(), UAFClientError.NO_ERROR);
         }
+        if (intent != null) {
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(RESULT_CANCELED);
     }
 
     public void showAuthenticator(List<AuthenticatorInfo> infos, AuthenticatorAdapter.OnAuthenticatorClickCallback callback) {
         AuthenticatorAdapter adapter = new AuthenticatorAdapter(this, infos, callback);
         rvAuthenticators.setAdapter(adapter);
     }
-
 }

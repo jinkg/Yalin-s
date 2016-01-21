@@ -18,6 +18,13 @@
             android:textColor="@color/success_color"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/tv_prompt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/warning_color"
+            android:textSize="16sp" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_authenticators"
             android:layout_width="match_parent"
@@ -25,15 +32,5 @@
             android:layout_marginTop="20dp"
             android:padding="@dimen/authenticator_item_rv_padding" />
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="200dp">
-
-            <TextView
-                android:id="@+id/tv_prompt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </ScrollView>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

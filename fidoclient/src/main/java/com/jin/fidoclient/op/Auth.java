@@ -16,9 +16,14 @@
 package com.jin.fidoclient.op;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.jin.fidoclient.api.UAFClientError;
+import com.jin.fidoclient.api.UAFIntent;
+import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.api.StatusCode;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
@@ -33,24 +38,24 @@ import com.jin.fidoclient.msg.AuthenticatorSignAssertion;
 import com.jin.fidoclient.msg.ChannelBinding;
 import com.jin.fidoclient.msg.FinalChallengeParams;
 import com.jin.fidoclient.msg.OperationHeader;
+import com.jin.fidoclient.msg.Policy;
+import com.jin.fidoclient.msg.Version;
+import com.jin.fidoclient.msg.client.UAFMessage;
+import com.jin.fidoclient.op.traffic.Traffic;
 import com.jin.fidoclient.ui.AuthenticatorAdapter;
 import com.jin.fidoclient.ui.FIDOOperationActivity;
 import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidoclient.utils.Utils;
 
-import java.util.List;
-
 public class Auth extends ASMMessageHandler implements AuthenticatorAdapter.OnAuthenticatorClickCallback {
     private static final String TAG = Auth.class.getSimpleName();
     private final AuthenticationRequest authenticationRequest;
-    private final FIDOOperationActivity activity;
     private final ChannelBinding channelBinding;
-    private final HandleResultCallback callback;
 
     private String finalChallenge;
 
-    public Auth(FIDOOperationActivity activity, String message, String channelBinding, HandleResultCallback callback) {
-        this.activity = activity;
+    public Auth(FIDOOperationActivity activity, String message, String channelBinding) {
+        super(activity);
         try {
             authenticationRequest = getAuthRequest(message);
         } catch (Exception e) {
@@ -63,33 +68,67 @@ public class Auth extends ASMMessageHandler implements AuthenticatorAdapter.OnAu
             cb = null;
         }
         this.channelBinding = cb;
-        this.callback = callback;
+        updateState(Traffic.OpStat.PREPARE);
     }
 
+
     @Override
-    public void handle() {
-        List<AuthenticatorInfo> authenticatorInfos = parsePolicy(authenticationRequest.policy);
-        StatLog.printLog(TAG, "client auth parse policy: " + gson.toJson(authenticatorInfos));
-        if (authenticatorInfos == null || authenticatorInfos.isEmpty()) {
-            return;
+    public boolean startTraffic() {
+        switch (mCurrentState) {
+            case PREPARE:
+                String getInfoMessage = getInfoRequest(new Version(1, 0));
+                ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, getInfoMessage);
+                updateState(Traffic.OpStat.GET_INFO_PENDING);
+                break;
+            default:
+                return false;
         }
-        activity.showAuthenticator(authenticatorInfos, this);
+        return true;
     }
 
     @Override
-    public String parseAsmResponse(String asmResponseMsg) throws ASMException {
-        ASMResponse asmResponse = ASMResponse.fromJson(asmResponseMsg, AuthenticateOut.class);
+    public boolean traffic(String asmResponseMsg) throws ASMException {
+        StatLog.printLog(TAG, "asm response: " + asmResponseMsg);
+        switch (mCurrentState) {
+            case GET_INFO_PENDING:
+                if (!handleGetInfo(asmResponseMsg, this)) {
+                    return false;
+                }
+                updateState(Traffic.OpStat.REG_PENDING);
+                break;
+            case REG_PENDING:
+                handleAuthOut(asmResponseMsg);
+                updateState(Traffic.OpStat.PREPARE);
+                break;
+            default:
+                return false;
+        }
+        return true;
+
+    }
+
+    @Override
+    public Policy getPolicy() {
+        return authenticationRequest.policy;
+    }
+
+    private void handleAuthOut(String msg) throws ASMException {
+        ASMResponse asmResponse = ASMResponse.fromJson(msg, AuthenticateOut.class);
         if (asmResponse.statusCode != StatusCode.UAF_ASM_STATUS_OK) {
             throw new ASMException(asmResponse.statusCode);
         }
+        String response;
         if (asmResponse.responseData instanceof AuthenticateOut) {
             AuthenticateOut authenticateOut = (AuthenticateOut) asmResponse.responseData;
             AuthenticationResponse[] responses = new AuthenticationResponse[1];
             responses[0] = wrapResponse(authenticateOut);
-            return gson.toJson(responses);
+            response = gson.toJson(responses);
         } else {
             throw new ASMException(StatusCode.UAF_ASM_STATUS_ERROR);
         }
+        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), UAFClientError.NO_ERROR, new UAFMessage(response).toJson());
+        activity.setResult(Activity.RESULT_OK, intent);
+        activity.finish();
     }
 
     private AuthenticationResponse wrapResponse(AuthenticateOut authenticateOut) {
@@ -134,8 +173,8 @@ public class Auth extends ASMMessageHandler implements AuthenticatorAdapter.OnAu
         asmRequest.args = authenticateIn;
         asmRequest.asmVersion = authenticationRequest.header.upv;
         asmRequest.authenticatorIndex = info.authenticatorIndex;
-        if (callback != null) {
-            callback.onResult(gson.toJson(asmRequest));
-        }
+        String asmRequestMsg = gson.toJson(asmRequest);
+        StatLog.printLog(TAG, "asm request: " + asmRequestMsg);
+        ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, asmRequestMsg);
     }
 }

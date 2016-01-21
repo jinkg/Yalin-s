@@ -33,7 +33,7 @@ public class Auth extends ASMOperator implements Simulator.BiometricsAuthResultC
 
     @Override
     public void onAuthSuccess(Simulator simulator, String biometricsId) {
-        StatLog.printLog(TAG, "asm auth biometrics auth success,handle asmRequest");
+        StatLog.printLog(TAG, "asm auth biometrics auth success,prepare asmRequest");
         ASMResponse<AuthenticateOut> response = new ASMResponse<>();
         try {
             AuthenticateOut authenticateOut = Simulator.authenticate(biometricsId, (AuthenticateIn) request.args, request.authenticatorIndex);

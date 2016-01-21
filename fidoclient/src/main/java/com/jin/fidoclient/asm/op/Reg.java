@@ -34,7 +34,7 @@ public class Reg extends ASMOperator implements Simulator.BiometricsAuthResultCa
 
     @Override
     public void onAuthSuccess(Simulator simulator, String biometricsId) {
-        StatLog.printLog(TAG, "asm reg biometrics auth success,handle asmRequest");
+        StatLog.printLog(TAG, "asm reg biometrics auth success,prepare asmRequest");
         ASMResponse<RegisterOut> response = new ASMResponse<>();
         try {
             RegisterOut registerOut = Simulator.register(biometricsId, (RegisterIn) request.args, request.authenticatorIndex);

@@ -14,6 +14,12 @@ import com.jin.fidoclient.utils.StatLog;
 public class GetInfo extends ASMOperator {
     private static final String TAG = GetInfo.class.getSimpleName();
 
+    private final HandleResultCallback callback;
+
+    public GetInfo(HandleResultCallback callback) {
+        this.callback = callback;
+    }
+
     @Override
     public void handle() {
         StatLog.printLog(TAG, "asm getInfo");
@@ -23,7 +29,11 @@ public class GetInfo extends ASMOperator {
         getInfoOut.Authenticators = getAvailableAuthenticator();
         response.responseData = getInfoOut;
         response.statusCode = StatusCode.UAF_ASM_STATUS_OK;
-        gson.toJson(response);
+        String getInfoResult = gson.toJson(response);
+        StatLog.printLog(TAG, "get info result:" + getInfoResult);
+        if (callback != null) {
+            callback.onHandleResult(getInfoResult);
+        }
     }
 
     private AuthenticatorInfo[] getAvailableAuthenticator() {

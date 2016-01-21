@@ -1,23 +1,22 @@
 package com.jin.fidoclient.op;
 
 
-import android.content.Context;
 
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.msg.Policy;
 import com.jin.fidoclient.msg.RegistrationRequest;
+import com.jin.fidoclient.ui.FIDOOperationActivity;
 
 /**
  * Created by YaLin on 2016/1/18.
  */
 public class CheckPolicy extends ASMMessageHandler {
-    private Context context;
     private Policy policy;
 
-    public CheckPolicy(Context context, String message) {
-        this.context = context;
+    public CheckPolicy(FIDOOperationActivity activity, String message) {
+        super(activity);
         try {
             RegistrationRequest registrationRequest = getRegistrationRequest(message);
             policy = registrationRequest.policy;
@@ -27,15 +26,16 @@ public class CheckPolicy extends ASMMessageHandler {
     }
 
     @Override
-    public void handle() {
+    public boolean startTraffic() {
         ASMRequest asmRequest = new ASMRequest();
         asmRequest.requestType = Request.GetInfo;
         gson.toJson(asmRequest);
+        return true;
     }
 
     @Override
-    public String parseAsmResponse(String asmResponseMsg) throws ASMException {
-        return null;
+    public boolean traffic(String asmResponseMsg) throws ASMException {
+        return false;
     }
 
     private RegistrationRequest getRegistrationRequest(String uafMsg) {

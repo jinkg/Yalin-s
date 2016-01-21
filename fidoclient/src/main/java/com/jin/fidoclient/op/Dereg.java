@@ -17,12 +17,21 @@
 package com.jin.fidoclient.op;
 
 
+import android.app.Activity;
+import android.content.Intent;
+
 import com.google.gson.Gson;
+import com.jin.fidoclient.api.UAFClientError;
+import com.jin.fidoclient.api.UAFIntent;
+import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.asm.msg.obj.DeregisterIn;
 import com.jin.fidoclient.msg.DeregResponse;
 import com.jin.fidoclient.msg.DeregistrationRequest;
+import com.jin.fidoclient.msg.client.UAFMessage;
+import com.jin.fidoclient.op.traffic.Traffic;
+import com.jin.fidoclient.ui.FIDOOperationActivity;
 import com.jin.fidoclient.utils.StatLog;
 
 
@@ -32,33 +41,58 @@ public class Dereg extends ASMMessageHandler {
     private Gson gson = new Gson();
 
     private final DeregistrationRequest deregistrationRequest;
-    private final HandleResultCallback callback;
 
-    public Dereg(String message, HandleResultCallback callback) {
+    public Dereg(FIDOOperationActivity activity, String message) {
+        super(activity);
+        updateState(Traffic.OpStat.PREPARE);
         this.deregistrationRequest = getDeregistrationRequest(message);
-        this.callback = callback;
     }
 
     @Override
-    public void handle() {
-        try {
-            DeregisterIn deregisterIn = new DeregisterIn(deregistrationRequest.header.appID, deregistrationRequest.authenticators[0].keyID);
-
-            ASMRequest<DeregisterIn> asmRequest = new ASMRequest<>();
-            asmRequest.requestType = Request.Deregister;
-            asmRequest.args = deregisterIn;
-            asmRequest.asmVersion = deregistrationRequest.header.upv;
-            if (callback != null) {
-                callback.onResult(gson.toJson(asmRequest));
-            }
-        } catch (Exception e) {
-            StatLog.printLog(TAG, "generate dereg asm request error. error is:" + e.getMessage());
+    public boolean startTraffic() {
+        switch (mCurrentState) {
+            case PREPARE:
+                String deregMsg = dereg();
+                ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, deregMsg);
+                updateState(Traffic.OpStat.DEREG_PENDING);
+                break;
+            default:
+                return false;
         }
+        return true;
     }
 
     @Override
-    public String parseAsmResponse(String asmResponseMsg) {
-        return gson.toJson(new DeregResponse((short) 0));
+    public boolean traffic(String asmResponseMsg) {
+        switch (mCurrentState) {
+            case DEREG_PENDING:
+                String deregMsg = gson.toJson(new DeregResponse((short) 0));
+                handleDeregOut(deregMsg);
+                updateState(Traffic.OpStat.PREPARE);
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
+
+    private String dereg() {
+        DeregisterIn deregisterIn = new DeregisterIn(deregistrationRequest.header.appID, deregistrationRequest.authenticators[0].keyID);
+
+        ASMRequest<DeregisterIn> asmRequest = new ASMRequest<>();
+        asmRequest.requestType = Request.Deregister;
+        asmRequest.args = deregisterIn;
+        asmRequest.asmVersion = deregistrationRequest.header.upv;
+        String asmRequestMsg = gson.toJson(asmRequest);
+        StatLog.printLog(TAG, "asm request: " + asmRequestMsg);
+        return asmRequestMsg;
+    }
+
+    private void handleDeregOut(String msg) {
+        StatLog.printLog(TAG, "client dereg result:" + msg);
+        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), UAFClientError.NO_ERROR, new UAFMessage(msg).toJson());
+        activity.setResult(Activity.RESULT_OK, intent);
+        activity.finish();
     }
 
     private DeregistrationRequest getDeregistrationRequest(String uafMsg) {

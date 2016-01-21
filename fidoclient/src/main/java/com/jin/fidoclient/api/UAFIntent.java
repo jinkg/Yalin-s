@@ -121,7 +121,7 @@ public class UAFIntent {
      * This Android intent invokes the FIDO UAF Client to process the supplied request message
      * and return a response message ready for delivery to the FIDO UAF Server.
      * The sender should assume that the FIDO UAF Client will display a user interface
-     * allowing the user to handle this intent, for example, prompting the user to complete their verification ceremony.
+     * allowing the user to prepare this intent, for example, prompting the user to complete their verification ceremony.
      * <p/>
      * This intent must be invoked with startActivityForResult().
      * <p/>

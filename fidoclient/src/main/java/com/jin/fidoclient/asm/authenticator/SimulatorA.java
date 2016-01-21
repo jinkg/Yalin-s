@@ -33,7 +33,8 @@ import java.security.NoSuchProviderException;
 public class SimulatorA extends Simulator implements FingerprintAuthenticationDialogFragment.FingerprintAuthenticationResultCallback {
     private static final String TAG = SimulatorA.class.getSimpleName();
 
-    public static final String AAID = "EBA0#0001";
+    //    public static final String AAID = "EBA0#0001";
+    public static final String AAID = "4e4e#4005";
     private static final String SIMULATOR_TYPE = "fingerprint";
     private static final String ASSERTION_SCHEME = "UAFV1TLV";
 
@@ -114,7 +115,7 @@ public class SimulatorA extends Simulator implements FingerprintAuthenticationDi
         AuthenticatorInfo authenticatorInfo = new AuthenticatorInfo();
 
         int[] attestationTypes = new int[2];
-        attestationTypes[0] = TAG_ATTESTATION_CERT;
+        attestationTypes[0] = TAG_ATTESTATION_BASIC_SURROGATE;
         attestationTypes[1] = TAG_ATTESTATION_BASIC_FULL;
         authenticatorInfo.hasSettings(false)
                 .aaid(AAID)

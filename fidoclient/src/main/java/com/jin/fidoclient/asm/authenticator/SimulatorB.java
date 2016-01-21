@@ -112,7 +112,7 @@ public class SimulatorB extends Simulator {
         AuthenticatorInfo authenticatorInfo = new AuthenticatorInfo();
 
         int[] attestationTypes = new int[2];
-        attestationTypes[0] = TAG_ATTESTATION_CERT;
+        attestationTypes[0] = TAG_ATTESTATION_BASIC_SURROGATE;
         attestationTypes[1] = TAG_ATTESTATION_BASIC_FULL;
         authenticatorInfo.hasSettings(false)
                 .aaid(AAID)

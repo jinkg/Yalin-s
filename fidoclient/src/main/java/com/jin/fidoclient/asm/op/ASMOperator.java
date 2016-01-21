@@ -38,9 +38,9 @@ public abstract class ASMOperator {
                 return new Auth(activity, asmRequest, callback);
             } else if (requestType.equals(Request.Deregister.name())) {
                 asmRequest = ASMRequest.fromJson(asmMessage, DeregisterIn.class);
-                return new Dereg(asmRequest,callback);
+                return new Dereg(asmRequest, callback);
             } else if (requestType.equals(Request.GetInfo.name())) {
-                return new GetInfo();
+                return new GetInfo(callback);
             }
         } catch (JSONException e) {
         }
