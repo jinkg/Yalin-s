@@ -26,7 +26,7 @@
     <string name="sign_in">Sign in</string>
     <string name="fingerprint_description">Confirm fingerprint to continue</string>
 
-    <string name="message_error">error: uaf message is empty</string>
+    <string name="client_op_type_error">error: uaf type error</string>
     <string name="handle_error">error: prepare uaf op error</string>
     <string name="unknown_device">unknown device</string>
     <string name="select_device_type">All available device are present below,

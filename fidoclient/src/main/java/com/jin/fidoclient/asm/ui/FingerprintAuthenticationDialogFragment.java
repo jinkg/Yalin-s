@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,7 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
 
     private Stage mStage = Stage.FINGERPRINT;
 
-    private FingerprintManager.CryptoObject mCryptoObject;
+    private FingerprintManagerCompat.CryptoObject mCryptoObject;
     private FingerprintUiHelper mFingerprintUiHelper;
 
     private FingerprintAuthenticationResultCallback callback;
@@ -87,7 +88,8 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
 
         mFingerprintContent = v.findViewById(R.id.fingerprint_container);
 
-        FingerprintManager manager = getActivity().getApplicationContext().getSystemService(FingerprintManager.class);
+
+        FingerprintManagerCompat manager = FingerprintManagerCompat.from(getActivity());
         mFingerprintUiHelperBuilder = new FingerprintUiHelper.FingerprintUiHelperBuilder(manager);
         mFingerprintUiHelper = mFingerprintUiHelperBuilder.build(
                 (ImageView) v.findViewById(R.id.fingerprint_icon),
@@ -127,7 +129,7 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
     /**
      * Sets the crypto object to be passed in when authenticating with fingerprint.
      */
-    public void setCryptoObject(FingerprintManager.CryptoObject cryptoObject) {
+    public void setCryptoObject(FingerprintManagerCompat.CryptoObject cryptoObject) {
         mCryptoObject = cryptoObject;
     }
 

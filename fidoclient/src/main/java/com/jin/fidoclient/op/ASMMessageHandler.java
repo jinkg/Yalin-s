@@ -54,6 +54,8 @@ public abstract class ASMMessageHandler {
             return new CheckPolicy(activity, uafMessage);
         } else if (UAFIntentType.DISCOVER.name().equals(intentType)) {
             return new Discover(activity);
+        } else if (UAFIntentType.UAF_OPERATION_COMPLETION_STATUS.name().equals(intentType)) {
+            return new Completion(activity);
         }
         return new ASMMessageHandler(activity) {
             @Override

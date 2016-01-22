@@ -10,6 +10,7 @@
 
     <ImageView
         android:id="@+id/item_iv_icon"
+
         android:layout_width="48dp"
         android:layout_height="48dp" />
 

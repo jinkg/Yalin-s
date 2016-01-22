@@ -1,6 +1,8 @@
 package com.jin.fidoclient.ui;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -48,11 +50,13 @@ public class AuthenticatorAdapter extends RecyclerView.Adapter<AuthenticatorItem
         if (TextUtils.isEmpty(info.icon)) {
             if (info.iconRes <= 0) {
                 info.iconRes = R.drawable.ic_linked_camera_black_48dp;
-                Drawable drawable = mContext.getDrawable(info.iconRes);
-                drawable.setTint(mContext.getColor(R.color.hint_color));
-                holder.ivIcon.setImageDrawable(drawable);
+                Resources res = mContext.getResources();
+                Drawable background = res.getDrawable(info.iconRes);
+                int primaryColor = res.getColor(R.color.hint_color);
+                background.setColorFilter(primaryColor, PorterDuff.Mode.SRC_IN);
+                holder.ivIcon.setBackground(background);
             } else {
-                holder.ivIcon.setImageDrawable(mContext.getDrawable(info.iconRes));
+                holder.ivIcon.setImageResource(info.iconRes);
             }
 
         }

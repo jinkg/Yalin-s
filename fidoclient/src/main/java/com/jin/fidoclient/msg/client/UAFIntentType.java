@@ -34,7 +34,7 @@ public enum UAFIntentType {
 
     //Inform the FIDO UAF Client of the completion status of a Registration, Authentication,
     // Transaction Confirmation or Deregistration message.
-    UAF_OPERATION_COMPLETION_STATUS;
+    UAF_OPERATION_COMPLETION_STATUS
 
 
 }

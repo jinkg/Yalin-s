@@ -81,8 +81,8 @@ public class UAFClientActivity extends AppCompatActivity {
     }
 
     private void doConfirm() {
-        if (TextUtils.isEmpty(message)) {
-            showError(R.string.message_error);
+        if (TextUtils.isEmpty(intentType)) {
+            showError(R.string.client_op_type_error);
             return;
         }
         processMessage(message);
@@ -99,6 +99,9 @@ public class UAFClientActivity extends AppCompatActivity {
     }
 
     private String extract(String inMsg) {
+        if (TextUtils.isEmpty(inMsg)) {
+            return null;
+        }
         UAFMessage uafMessage = new UAFMessage();
         uafMessage.loadFromJson(inMsg);
         return uafMessage.uafProtocolMessage;
