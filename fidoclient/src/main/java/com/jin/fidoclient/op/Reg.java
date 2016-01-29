@@ -142,11 +142,13 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
     @Override
     public void onAuthenticatorClick(AuthenticatorInfo info) {
         String facetId = Utils.getFacetId(activity.getApplication());
-        if (TextUtils.isEmpty(registrationRequest.header.appID)) {
-            registrationRequest.header.appID = facetId;
-        }
+
         FinalChallengeParams fcParams = new FinalChallengeParams();
-        fcParams.appID = registrationRequest.header.appID;
+        if (TextUtils.isEmpty(registrationRequest.header.appID)) {
+            fcParams.appID = facetId;
+        } else {
+            fcParams.appID = registrationRequest.header.appID;
+        }
         fcParams.challenge = registrationRequest.challenge;
         fcParams.facetID = facetId;
         fcParams.channelBinding = channelBinding;

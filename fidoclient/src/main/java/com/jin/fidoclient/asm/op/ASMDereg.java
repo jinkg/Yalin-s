@@ -24,14 +24,12 @@ import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.obj.DeregisterIn;
 import com.jin.fidoclient.utils.StatLog;
 
-import java.util.logging.Logger;
-
-public class Dereg extends ASMOperator {
-    private static final String TAG = Dereg.class.getSimpleName();
+public class ASMDereg extends ASMOperator {
+    private static final String TAG = ASMDereg.class.getSimpleName();
     private final ASMRequest request;
     private final HandleResultCallback callback;
 
-    public Dereg(ASMRequest request, HandleResultCallback callback) {
+    public ASMDereg(ASMRequest request, HandleResultCallback callback) {
         if (!(request.args instanceof DeregisterIn)) {
             throw new IllegalStateException("asm request must has a DeregisterIn object");
         }

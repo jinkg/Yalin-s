@@ -69,7 +69,6 @@ public class Discover extends ASMMessageHandler {
         }
         GetInfoOut getInfoOut = (GetInfoOut) asmResponse.responseData;
         AuthenticatorInfo[] authenticatorInfos = getInfoOut.Authenticators;
-        StatLog.printLog(TAG, "client reg parse policy: " + gson.toJson(authenticatorInfos));
         if (authenticatorInfos == null) {
             return false;
         }

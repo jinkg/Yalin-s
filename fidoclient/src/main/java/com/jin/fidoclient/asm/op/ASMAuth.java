@@ -10,13 +10,13 @@ import com.jin.fidoclient.asm.msg.obj.AuthenticateIn;
 import com.jin.fidoclient.asm.msg.obj.AuthenticateOut;
 import com.jin.fidoclient.utils.StatLog;
 
-public class Auth extends ASMOperator implements Simulator.BiometricsAuthResultCallback {
-    private static final String TAG = Auth.class.getSimpleName();
+public class ASMAuth extends ASMOperator implements Simulator.BiometricsAuthResultCallback {
+    private static final String TAG = ASMAuth.class.getSimpleName();
     private final ASMRequest request;
     private final Activity activity;
     private final HandleResultCallback callback;
 
-    public Auth(Activity activity, ASMRequest request, HandleResultCallback callback) {
+    public ASMAuth(Activity activity, ASMRequest request, HandleResultCallback callback) {
         if (!(request.args instanceof AuthenticateIn)) {
             throw new IllegalStateException("asm request must has a AuthenticateIn object");
         }

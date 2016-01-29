@@ -172,6 +172,16 @@ public class UAFIntent {
         return intent;
     }
 
+    public static Intent getUAFOperationCancelIntent( short errorCode) {
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION_RESULT.name());
+        bundle.putShort(ERROR_CODE_KEY, errorCode);
+        intent.putExtras(bundle);
+
+        return intent;
+    }
+
     /**
      * This intent must be delivered to the FIDO UAF Client to indicate
      * the processing status of a FIDO UAF message delivered to the remote server.

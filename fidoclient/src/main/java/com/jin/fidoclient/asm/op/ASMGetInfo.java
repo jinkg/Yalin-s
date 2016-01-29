@@ -11,12 +11,12 @@ import com.jin.fidoclient.utils.StatLog;
 /**
  * Created by YaLin on 2016/1/18.
  */
-public class GetInfo extends ASMOperator {
-    private static final String TAG = GetInfo.class.getSimpleName();
+public class ASMGetInfo extends ASMOperator {
+    private static final String TAG = ASMGetInfo.class.getSimpleName();
 
     private final HandleResultCallback callback;
 
-    public GetInfo(HandleResultCallback callback) {
+    public ASMGetInfo(HandleResultCallback callback) {
         this.callback = callback;
     }
 

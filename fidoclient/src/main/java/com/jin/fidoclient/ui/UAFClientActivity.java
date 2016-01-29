@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jin.fidoclient.R;
+import com.jin.fidoclient.api.UAFClientError;
 import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidoclient.asm.api.ASMIntent;
 import com.jin.fidoclient.asm.exceptions.ASMException;
@@ -114,7 +115,8 @@ public class UAFClientActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        setResult(RESULT_CANCELED);
+        Intent intent = UAFIntent.getUAFOperationCancelIntent(UAFClientError.USER_CANCELLED);
+        setResult(RESULT_CANCELED, intent);
     }
 
     public void showAuthenticator(List<AuthenticatorInfo> infos, AuthenticatorAdapter.OnAuthenticatorClickCallback callback) {

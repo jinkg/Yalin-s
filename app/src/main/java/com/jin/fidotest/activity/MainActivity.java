@@ -2,12 +2,15 @@ package com.jin.fidotest.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidotest.R;
 import com.jin.fidotest.data.User;
 

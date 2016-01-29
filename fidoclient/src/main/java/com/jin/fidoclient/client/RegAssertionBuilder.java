@@ -120,8 +120,8 @@ public class RegAssertionBuilder {
 
     private byte[] getSignedData(String fcParams, byte[] keyId) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
         ByteArrayOutputStream byteout = new ByteArrayOutputStream();
-        byte[] value = null;
-        int length = 0;
+        byte[] value;
+        int length;
 
         byteout.write(encodeInt(TagsEnum.TAG_AAID.id));
         value = getAAID();

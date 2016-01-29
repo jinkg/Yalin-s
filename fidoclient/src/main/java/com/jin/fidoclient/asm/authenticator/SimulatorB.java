@@ -3,6 +3,7 @@ package com.jin.fidoclient.asm.authenticator;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -50,8 +51,8 @@ public class SimulatorB extends Simulator {
     }
 
     @Override
-    public RegisterOut register(String biometricsId, RegisterIn registerIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
-        if (TextUtils.isEmpty(biometricsId) || registerIn == null) {
+    public RegisterOut register(@NonNull String biometricsId, @NonNull RegisterIn registerIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+        if (TextUtils.isEmpty(biometricsId)) {
             throw new IllegalArgumentException();
         }
         StatLog.printLog(TAG, "simulatorB register biometricsId: " + biometricsId + " registerIn: " + new Gson().toJson(registerIn));
@@ -84,7 +85,7 @@ public class SimulatorB extends Simulator {
     }
 
     @Override
-    public AuthenticateOut authenticate(String biometricsId, AuthenticateIn authenticateIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+    public AuthenticateOut authenticate(@NonNull String biometricsId, @NonNull AuthenticateIn authenticateIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         StatLog.printLog(TAG, "simulatorB authenticate biometricsId: " + biometricsId + " authenticateIn: " + new Gson().toJson(authenticateIn));
         UAFDBHelper dbHelper = UAFDBHelper.getInstance(UAFClientApi.getContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -132,7 +133,7 @@ public class SimulatorB extends Simulator {
     }
 
     @Override
-    public void showBiometricsAuth(Activity activity, final BiometricsAuthResultCallback callback) {
+    public void showBiometricsAuth(@NonNull Activity activity, final BiometricsAuthResultCallback callback) {
         final String[] ids = activity.getResources().getStringArray(R.array.touch_ids);
         new AlertDialog.Builder(activity)
                 .setItems(ids,

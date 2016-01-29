@@ -71,7 +71,6 @@ public class ASMOperationActivity extends AppCompatActivity implements View.OnCl
 
         if (OpType == Request.Deregister || OpType == Request.GetInfo) {
             btnDo.setEnabled(false);
-            ASMOperator.parseMessage(this, message, this).handle();
         }
     }
 

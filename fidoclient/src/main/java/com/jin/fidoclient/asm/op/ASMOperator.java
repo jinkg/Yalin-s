@@ -32,15 +32,15 @@ public abstract class ASMOperator {
             String requestType = jsonObject.getString(TYPE_KEY);
             if (requestType.equals(Request.Register.name())) {
                 asmRequest = ASMRequest.fromJson(asmMessage, RegisterIn.class);
-                return new Reg(activity, asmRequest, callback);
+                return new ASMReg(activity, asmRequest, callback);
             } else if (requestType.equals(Request.Authenticate.name())) {
                 asmRequest = ASMRequest.fromJson(asmMessage, AuthenticateIn.class);
-                return new Auth(activity, asmRequest, callback);
+                return new ASMAuth(activity, asmRequest, callback);
             } else if (requestType.equals(Request.Deregister.name())) {
                 asmRequest = ASMRequest.fromJson(asmMessage, DeregisterIn.class);
-                return new Dereg(asmRequest, callback);
+                return new ASMDereg(asmRequest, callback);
             } else if (requestType.equals(Request.GetInfo.name())) {
-                return new GetInfo(callback);
+                return new ASMGetInfo(callback);
             }
         } catch (JSONException e) {
         }

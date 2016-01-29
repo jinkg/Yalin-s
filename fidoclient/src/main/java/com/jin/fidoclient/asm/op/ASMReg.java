@@ -11,13 +11,13 @@ import com.jin.fidoclient.asm.msg.obj.RegisterOut;
 import com.jin.fidoclient.utils.StatLog;
 
 
-public class Reg extends ASMOperator implements Simulator.BiometricsAuthResultCallback {
-    public static final String TAG = Reg.class.getSimpleName();
+public class ASMReg extends ASMOperator implements Simulator.BiometricsAuthResultCallback {
+    public static final String TAG = ASMReg.class.getSimpleName();
     private final ASMRequest request;
     private final Activity activity;
     private final HandleResultCallback callback;
 
-    public Reg(Activity activity, ASMRequest request, HandleResultCallback callback) {
+    public ASMReg(Activity activity, ASMRequest request, HandleResultCallback callback) {
         if (!(request.args instanceof RegisterIn)) {
             throw new IllegalStateException("asm request must has a RegisterIn object");
         }
@@ -47,6 +47,7 @@ public class Reg extends ASMOperator implements Simulator.BiometricsAuthResultCa
         } catch (Exception e) {
             response.statusCode = StatusCode.UAF_ASM_STATUS_ERROR;
         }
+        StatLog.printLog(TAG, "asm response is:" + gson.toJson(response));
         if (callback != null) {
             callback.onHandleResult(gson.toJson(response));
         }
