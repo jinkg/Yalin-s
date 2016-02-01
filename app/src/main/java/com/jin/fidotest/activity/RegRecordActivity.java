@@ -24,6 +24,7 @@ import com.jin.fidoclient.asm.db.RegRecord;
 import com.jin.fidoclient.msg.DeregistrationRequest;
 import com.jin.fidoclient.msg.RegistrationResponse;
 import com.jin.fidoclient.msg.client.UAFMessage;
+import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidotest.R;
 import com.jin.fidotest.adapter.RegRecordAdapter;
 import com.jin.fidotest.data.User;
@@ -208,6 +209,8 @@ public class RegRecordActivity extends BaseLoadActivity implements RegRecordAdap
                     }
                 }
         );
+
+        StatLog.printLog(TAG, "finish reg:" + new Gson().toJson(registrationResponses));
         request.setBody(new Gson().toJson(registrationResponses));
         request.setTag(TAG);
         requestQueue.add(request);

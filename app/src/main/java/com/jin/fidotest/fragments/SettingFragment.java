@@ -19,6 +19,7 @@ import com.jin.fidoclient.api.UAFClientApi;
 import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidoclient.msg.RegistrationResponse;
 import com.jin.fidoclient.msg.client.UAFMessage;
+import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidotest.R;
 import com.jin.fidotest.data.User;
 import com.jin.fidotest.net.GetRequest;
@@ -173,6 +174,7 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
                     }
                 }
         );
+        StatLog.printLog(TAG, "finish reg:" + new Gson().toJson(registrationResponses));
         request.setBody(new Gson().toJson(registrationResponses));
         request.setTag(TAG);
         requestQueue.add(request);

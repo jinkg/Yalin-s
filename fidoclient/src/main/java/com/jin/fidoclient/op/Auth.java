@@ -94,9 +94,9 @@ public class Auth extends ASMMessageHandler implements AuthenticatorAdapter.OnAu
                 if (!handleGetInfo(asmResponseMsg, this)) {
                     return false;
                 }
-                updateState(Traffic.OpStat.REG_PENDING);
+                updateState(Traffic.OpStat.AUTH_PENDING);
                 break;
-            case REG_PENDING:
+            case AUTH_PENDING:
                 handleAuthOut(asmResponseMsg);
                 updateState(Traffic.OpStat.PREPARE);
                 break;
