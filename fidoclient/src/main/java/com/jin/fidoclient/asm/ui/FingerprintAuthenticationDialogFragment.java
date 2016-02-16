@@ -18,7 +18,6 @@ package com.jin.fidoclient.asm.ui;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.view.LayoutInflater;

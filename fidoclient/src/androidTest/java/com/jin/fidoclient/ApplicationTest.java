@@ -4,7 +4,6 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.util.Base64;
 
-import com.jin.fidoclient.client.AttestCert;
 import com.jin.fidoclient.crypto.KeyCodec;
 
 import org.spongycastle.jce.interfaces.ECPublicKey;
@@ -13,7 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;

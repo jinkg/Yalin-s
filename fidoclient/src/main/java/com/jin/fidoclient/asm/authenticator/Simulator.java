@@ -2,16 +2,25 @@ package com.jin.fidoclient.asm.authenticator;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.util.Base64;
 
 import com.jin.fidoclient.asm.msg.obj.AuthenticateIn;
 import com.jin.fidoclient.asm.msg.obj.AuthenticateOut;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.asm.msg.obj.RegisterIn;
 import com.jin.fidoclient.asm.msg.obj.RegisterOut;
+import com.jin.fidoclient.crypto.Asn1;
+import com.jin.fidoclient.crypto.KeyCodec;
+import com.jin.fidoclient.crypto.NamedCurve;
+import com.jin.fidoclient.crypto.SHA;
 
+import org.spongycastle.jce.interfaces.ECPublicKey;
+
+import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 
 /**
  * Created by YaLin on 2016/1/18.
@@ -82,12 +91,12 @@ public abstract class Simulator {
         } else return SimulatorB.getInstance();
     }
 
-    public static RegisterOut register(@NonNull String biometricsId, @NonNull RegisterIn registerIn, @NonNull int authenticatorIndex) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+    public static RegisterOut register(@NonNull String biometricsId, @NonNull RegisterIn registerIn, int authenticatorIndex) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         Simulator simulator = getInstance(authenticatorIndex);
         return simulator.register(biometricsId, registerIn);
     }
 
-    public static AuthenticateOut authenticate(@NonNull String biometricsId, @NonNull AuthenticateIn authenticateIn, @NonNull int authenticatorIndex) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+    public static AuthenticateOut authenticate(@NonNull String biometricsId, @NonNull AuthenticateIn authenticateIn, int authenticatorIndex) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
         Simulator simulator = getInstance(authenticatorIndex);
         return simulator.authenticate(biometricsId, authenticateIn);
     }
@@ -98,9 +107,37 @@ public abstract class Simulator {
 
     public abstract AuthenticateOut authenticate(@NonNull String biometricsId, @NonNull AuthenticateIn authenticateIn) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException;
 
-    protected abstract String getKeyId();
+    public abstract String getAAID();
+
+    public abstract String getScheme();
+
+    public abstract String getKeyId();
+
+    protected abstract String getPrivateKey();
+
+    public abstract String getPublicKey();
+
+    public abstract String getCert();
 
     protected abstract AuthenticatorInfo getInfo();
+
+    public byte[] sign(byte[] signBase) throws Exception {
+        PrivateKey privateKey =
+                KeyCodec.getPrivKey(Base64.decode(getPrivateKey(), Base64.URL_SAFE));
+
+        BigInteger[] signatureGen = NamedCurve.signAndFromatToRS(privateKey,
+                SHA.sha(signBase, "SHA-256"));
+
+        boolean verify = NamedCurve.verify(
+                KeyCodec.getKeyAsRawBytes((ECPublicKey) KeyCodec.getPubKey(Base64.decode(getPublicKey(), Base64.URL_SAFE))),
+                SHA.sha(signBase, "SHA-256"),
+                Asn1.decodeToBigIntegerArray(Asn1.getEncoded(signatureGen)));
+        if (!verify) {
+            throw new RuntimeException("Signature match fail");
+        }
+
+        return Asn1.toRawSignatureBytes(signatureGen);
+    }
 
     public static AuthenticatorInfo[] discover() {
         AuthenticatorInfo[] authenticatorInfos = new AuthenticatorInfo[2];

@@ -1,7 +1,10 @@
 package com.jin.fidoclient.op;
 
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jin.fidoclient.asm.api.StatusCode;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
@@ -92,9 +95,26 @@ public abstract class ASMMessageHandler {
         ASMRequest<RegisterIn> asmRequest = new ASMRequest<>();
         asmRequest.requestType = Request.GetInfo;
         asmRequest.asmVersion = version;
+        Gson gson = new GsonBuilder().setExclusionStrategies(getExclusionStrategy())
+                .create();
         String asmRequestMsg = gson.toJson(asmRequest);
         StatLog.printLog(TAG, "asm request: " + asmRequestMsg);
         return asmRequestMsg;
+    }
+
+    private ExclusionStrategy getExclusionStrategy() {
+        return new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes f) {
+                boolean skip = f.getName().equals(ASMRequest.authenticatorIndexName);
+                return skip;
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) {
+                return false;
+            }
+        };
     }
 
     protected boolean handleGetInfo(String msg, AuthenticatorAdapter.OnAuthenticatorClickCallback callback) {

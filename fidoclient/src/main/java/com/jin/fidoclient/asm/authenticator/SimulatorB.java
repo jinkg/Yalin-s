@@ -22,6 +22,7 @@ import com.jin.fidoclient.client.AuthenticationRequestProcessor;
 import com.jin.fidoclient.client.RegistrationRequestProcessor;
 import com.jin.fidoclient.crypto.BCrypt;
 import com.jin.fidoclient.crypto.KeyCodec;
+import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.utils.StatLog;
 
 import java.security.InvalidAlgorithmParameterException;
@@ -33,8 +34,13 @@ import java.security.NoSuchProviderException;
  * Created by YaLin on 2016/1/18.
  */
 public class SimulatorB extends Simulator {
+    private static final String CERT_BASE64 = "MIIBsDCCAVOgAwIBAgIEWkp1CzAMBggqhkjOPQQDAgUAMEwxCjAIBgNVBAYTATUxCjAIBgNVBAgTATQxCjAIBgNVBAcTATMxCjAIBgNVBAoTATIxCjAIBgNVBAsTATExDjAMBgNVBAMTBXlhbGluMB4XDTE2MDIxNjA4MjEwN1oXDTE2MDUxNjA4MjEwN1owTDEKMAgGA1UEBhMBNTEKMAgGA1UECBMBNDEKMAgGA1UEBxMBMzEKMAgGA1UEChMBMjEKMAgGA1UECxMBMTEOMAwGA1UEAxMFeWFsaW4wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQMCxHxENhZnSHpI_9TcQZtEFMuM6U6mS5DkcCWk_adbB7u79XNGctb571bngUjdtxYIQh34xezFu039rovkUXuoyEwHzAdBgNVHQ4EFgQUk1cphLxqkmvDiDe36r6gfpmnRSEwDAYIKoZIzj0EAwIFAANJADBGAiEAmmxOTbpNdtG_zycJkBmMzxfKIcx4UcYfQy2xmSiUt2cCIQCgGFy5P4w1dHKESXtaC3bCgRREY4MY4Ky7YkH7P9B0cw==";
+    private static final String PUBLIC_KEY_BASE64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEDAsR8RDYWZ0h6SP_U3EGbRBTLjOlOpkuQ5HAlpP2nWwe7u_VzRnLW-e9W54FI3bcWCEId-MXsxbtN_a6L5FF7g==";
+    private static final String PRIVATE_KEY_BASE64 = "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAyB-ylNKt5MH7w8Fh85v5F7IyUKcik8d7-taJ1PNEQXQ==";
+
     private static final String TAG = SimulatorB.class.getSimpleName();
-    public static final String AAID = "0015#0001";
+    //    public static final String AAID = "EBA0#0001";
+    public static final String AAID = "FFFF#0001";
     private static final String SIMULATOR_TYPE = "face";
     private static final String ASSERTION_SCHEME = "UAFV1TLV";
 
@@ -71,7 +77,7 @@ public class SimulatorB extends Simulator {
             byte[] keyIdBytes = regRecord.keyId.getBytes();
 
             RegistrationRequestProcessor p = new RegistrationRequestProcessor();
-            RegisterOut registerOut = p.processRequest(registerIn, keyPair, keyIdBytes, AAID);
+            RegisterOut registerOut = p.processRequest(registerIn, keyPair, keyIdBytes, this);
 
             regRecord.userPrivateKey = Base64.encodeToString(keyPair.getPrivate().getEncoded(), Base64.URL_SAFE);
             regRecord.userPublicKey = Base64.encodeToString(keyPair.getPublic().getEncoded(), Base64.URL_SAFE);
@@ -101,7 +107,17 @@ public class SimulatorB extends Simulator {
     }
 
     @Override
-    protected String getKeyId() {
+    public String getAAID() {
+        return AAID;
+    }
+
+    @Override
+    public String getScheme() {
+        return ASSERTION_SCHEME;
+    }
+
+    @Override
+    public String getKeyId() {
         String keyId = "yalin-test2-key-" + Base64.encodeToString(BCrypt.gensalt().getBytes(), Base64.NO_WRAP);
         keyId = Base64.encodeToString(keyId.getBytes(), Base64.URL_SAFE);
 
@@ -109,14 +125,36 @@ public class SimulatorB extends Simulator {
     }
 
     @Override
+    protected String getPrivateKey() {
+        return PRIVATE_KEY_BASE64;
+    }
+
+    @Override
+    public String getPublicKey() {
+        return PUBLIC_KEY_BASE64;
+    }
+
+    @Override
+    public String getCert() {
+        return CERT_BASE64;
+    }
+
+    @Override
     protected AuthenticatorInfo getInfo() {
         AuthenticatorInfo authenticatorInfo = new AuthenticatorInfo();
+
+        Version[] versions = new Version[1];
+        versions[0] = new Version(1, 0);
+        String[] extendIds = new String[1];
+        extendIds[0] = "abc123";
 
         int[] attestationTypes = new int[2];
         attestationTypes[0] = TAG_ATTESTATION_BASIC_SURROGATE;
         attestationTypes[1] = TAG_ATTESTATION_BASIC_FULL;
         authenticatorInfo.hasSettings(false)
                 .aaid(AAID)
+                .asmVersions(versions)
+                .supportedExtensionIDs(extendIds)
                 .assertionScheme(ASSERTION_SCHEME)
                 .authenticationAlgorithm(UAF_ALG_SIGN_SECP256R1_ECDSA_SHA256_DER)
                 .attestationTypes(attestationTypes)
@@ -126,7 +164,7 @@ public class SimulatorB extends Simulator {
                 .attachmentHint(ATTACHMENT_HINT_INTERNAL)
                 .isSecondFactorOnly(false)
                 .isRoamingAuthenticator(false)
-                .tcDisplay(TRANSACTION_CONFIRMATION_DISPLAY_PRIVILEGED_SOFTWARE);
+                .tcDisplay(TRANSACTION_CONFIRMATION_DISPLAY_ANY);
         authenticatorInfo.title = SIMULATOR_TYPE;
 
         return authenticatorInfo;
