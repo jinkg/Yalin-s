@@ -30,7 +30,7 @@ public class MatchCriteria {
     public long attachmentHint;
     //public int tcDisplay;
     //public int[] authenticationAlgorithms;
-    //public String[] assertionSchemes;
+    public String[] assertionSchemes;
     //public int[] attestationTypes;
     public int authenticatorVersion;
     public Extension[] exts;
@@ -39,10 +39,18 @@ public class MatchCriteria {
         boolean match = false;
         if (aaid != null) {
             if (!Arrays.asList(aaid).contains(info.aaid)) {
-                match = false;
-                return match;
+                return false;
             }
             match = true;
+        }
+        if (match) {
+            if (assertionSchemes != null) {
+                for (String assertionScheme : assertionSchemes) {
+                    if (!assertionScheme.equals(info.assertionScheme)) {
+                        return false;
+                    }
+                }
+            }
         }
         return match;
     }

@@ -10,4 +10,17 @@ public interface Constants {
 
     String FIDO_CLIENT_INTENT_MIME = "application/fido.uaf_client+json";
     String FIDO_ASM_INTENT_MIME = "application/fido.uaf_asm+json";
+
+    int CHALLENGE_MAX_LEN = 64;
+    int CHALLENGE_MIN_LEN = 8;
+
+    int USERNAME_MAX_LEN = 128;
+
+    int APP_ID_MAX_LEN = 512;
+
+    int SERVER_DATA_MAX_LEN = 1536;
+
+    String APP_ID_PREFIX = "https://";
+
+    String BASE64_REGULAR = "^[a-zA-Z0-9+/]+={0,2}$";
 }

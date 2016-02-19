@@ -72,7 +72,9 @@ public class UAFClientActivity extends AppCompatActivity {
             if (requestCode == ASMMessageHandler.REQUEST_ASM_OPERATION) {
                 String resultStr = data.getExtras().getString(ASMIntent.MESSAGE_KEY);
                 try {
-                    asmMessageHandler.traffic(resultStr);
+                    if (!asmMessageHandler.traffic(resultStr)) {
+                        finishWithError(UAFClientError.PROTOCOL_ERROR);
+                    }
                 } catch (ASMException e) {
                     Snackbar.make(coordinator, ASMException.class.getSimpleName() + ":" + e.statusCode, Snackbar.LENGTH_SHORT)
                             .show();
@@ -95,7 +97,7 @@ public class UAFClientActivity extends AppCompatActivity {
         StatLog.printLog(TAG, "extract message is:" + inMsg);
         asmMessageHandler = ASMMessageHandler.parseMessage(this, intentType, inMsg, channelBinding);
         if (!asmMessageHandler.startTraffic()) {
-            showError(R.string.handle_error);
+            finishWithError(UAFClientError.PROTOCOL_ERROR);
         }
     }
 
@@ -114,9 +116,18 @@ public class UAFClientActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = UAFIntent.getUAFOperationCancelIntent(UAFClientError.USER_CANCELLED);
+        finishWithError(UAFClientError.USER_CANCELLED);
+    }
+
+
+    private void setFailedIntent(short errorCode) {
+        Intent intent = UAFIntent.getUAFOperationErrorIntent(getComponentName().flattenToString(), errorCode);
         setResult(RESULT_CANCELED, intent);
+    }
+
+    private void finishWithError(short errorCode) {
+        setFailedIntent(errorCode);
+        finish();
     }
 
     public void showAuthenticator(List<AuthenticatorInfo> infos, AuthenticatorAdapter.OnAuthenticatorClickCallback callback) {

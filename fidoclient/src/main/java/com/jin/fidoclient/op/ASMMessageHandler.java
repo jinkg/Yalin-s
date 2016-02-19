@@ -38,6 +38,9 @@ public abstract class ASMMessageHandler {
     public static final String AUTH_TAG = "\"Auth\"";
     public static final String DEREG_TAG = "\"Dereg\"";
 
+    private static final String MAJOR_TAG = "\"major\": 1";
+    private static final String MINOR_TAG = "\"minor\": 0";
+
     protected final Gson gson = new Gson();
 
     protected Traffic.OpStat mCurrentState = Traffic.OpStat.PREPARE;
@@ -46,12 +49,14 @@ public abstract class ASMMessageHandler {
 
     public static ASMMessageHandler parseMessage(UAFClientActivity activity, String intentType, String uafMessage, String channelBinding) {
         if (UAFIntentType.UAF_OPERATION.name().equals(intentType)) {
-            if (uafMessage.contains(REG_TAG)) {
-                return new Reg(activity, uafMessage, channelBinding);
-            } else if (uafMessage.contains(AUTH_TAG)) {
-                return new Auth(activity, uafMessage, channelBinding);
-            } else if (uafMessage.contains(DEREG_TAG)) {
-                return new Dereg(activity, uafMessage);
+            if (uafMessage.contains(MAJOR_TAG) && uafMessage.contains(MINOR_TAG)) {
+                if (uafMessage.contains(REG_TAG)) {
+                    return new Reg(activity, uafMessage, channelBinding);
+                } else if (uafMessage.contains(AUTH_TAG)) {
+                    return new Auth(activity, uafMessage, channelBinding);
+                } else if (uafMessage.contains(DEREG_TAG)) {
+                    return new Dereg(activity, uafMessage);
+                }
             }
         } else if (UAFIntentType.CHECK_POLICY.name().equals(intentType)) {
             return new CheckPolicy(activity, uafMessage);
@@ -106,8 +111,7 @@ public abstract class ASMMessageHandler {
         return new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes f) {
-                boolean skip = f.getName().equals(ASMRequest.authenticatorIndexName);
-                return skip;
+                return f.getName().equals(ASMRequest.authenticatorIndexName);
             }
 
             @Override
@@ -131,6 +135,9 @@ public abstract class ASMMessageHandler {
             return false;
         }
         List<AuthenticatorInfo> parseResult = parsePolicy(getPolicy(), authenticatorInfos);
+        if (parseResult == null || parseResult.size() == 0) {
+            return false;
+        }
         activity.showAuthenticator(parseResult, callback);
         return true;
     }

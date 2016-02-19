@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.jin.fidoclient.api.UAFClientError;
 import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.api.StatusCode;
@@ -16,6 +15,7 @@ import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.asm.msg.obj.RegisterIn;
 import com.jin.fidoclient.asm.msg.obj.RegisterOut;
+import com.jin.fidoclient.constants.Constants;
 import com.jin.fidoclient.msg.AuthenticatorRegistrationAssertion;
 import com.jin.fidoclient.msg.ChannelBinding;
 import com.jin.fidoclient.msg.FinalChallengeParams;
@@ -44,11 +44,7 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
         if (TextUtils.isEmpty(message)) {
             throw new IllegalArgumentException();
         }
-        try {
-            this.registrationRequest = getRegistrationRequest(message);
-        } catch (Exception e) {
-            throw new IllegalStateException("register message error");
-        }
+        this.registrationRequest = getRegistrationRequest(message);
         ChannelBinding cb;
         try {
             cb = gson.fromJson(channelBinding, ChannelBinding.class);
@@ -61,6 +57,9 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
 
     @Override
     public boolean startTraffic() {
+        if (registrationRequest == null || activity == null) {
+            return false;
+        }
         switch (mCurrentState) {
             case PREPARE:
                 String getInfoMessage = getInfoRequest(new Version(1, 0));
@@ -112,7 +111,7 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
         } else {
             throw new ASMException(StatusCode.UAF_ASM_STATUS_ERROR);
         }
-        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), UAFClientError.NO_ERROR, new UAFMessage(response).toJson());
+        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), new UAFMessage(response).toJson());
         activity.setResult(Activity.RESULT_OK, intent);
         activity.finish();
     }
@@ -135,8 +134,69 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
     }
 
     private RegistrationRequest getRegistrationRequest(String uafMsg) {
-        RegistrationRequest[] requests = gson.fromJson(uafMsg, RegistrationRequest[].class);
-        return requests[0];
+        RegistrationRequest[] requests;
+        try {
+            requests = gson.fromJson(uafMsg, RegistrationRequest[].class);
+        } catch (Exception e) {
+            requests = null;
+        }
+        RegistrationRequest result;
+        if (requests == null || requests.length == 0) {
+            return null;
+        }
+        RegistrationRequest temp = null;
+        for (RegistrationRequest request : requests) {
+            if (request.header == null || request.header.upv == null) {
+                continue;
+            }
+            if (request.header.upv.equals(Version.getCurrentSupport())) {
+                if (temp == null) {
+                    temp = request;
+                } else {
+                    temp = null;
+                    break;
+                }
+            }
+        }
+        result = temp;
+        if (!checkRequest(result)) {
+            result = null;
+        }
+        return result;
+    }
+
+    private boolean checkRequest(RegistrationRequest registrationRequest) {
+        if (registrationRequest == null) {
+            return false;
+        }
+        if (registrationRequest.header == null) {
+            return false;
+        }
+        if (TextUtils.isEmpty(registrationRequest.challenge) || TextUtils.isEmpty(registrationRequest.username) || TextUtils.isEmpty(registrationRequest.header.serverData)) {
+            return false;
+        }
+        if (registrationRequest.challenge.length() < Constants.CHALLENGE_MIN_LEN || registrationRequest.challenge.length() > Constants.CHALLENGE_MAX_LEN) {
+            return false;
+        }
+        if (!registrationRequest.challenge.matches(Constants.BASE64_REGULAR)) {
+            return false;
+        }
+        if (registrationRequest.username.length() > Constants.USERNAME_MAX_LEN) {
+            return false;
+        }
+        if (registrationRequest.header.appID == null || registrationRequest.header.appID.length() > Constants.APP_ID_MAX_LEN) {
+            return false;
+        }
+        if (registrationRequest.header.appID.length() > 0 && !registrationRequest.header.appID.contains(Constants.APP_ID_PREFIX) && !registrationRequest.header.appID.equals(Utils.getFacetId(activity.getApplicationContext()))) {
+            return false;
+        }
+        if (registrationRequest.header.serverData.length() > Constants.SERVER_DATA_MAX_LEN) {
+            return false;
+        }
+        if (registrationRequest.policy == null || registrationRequest.policy.accepted == null) {
+            return false;
+        }
+        return true;
     }
 
     @Override

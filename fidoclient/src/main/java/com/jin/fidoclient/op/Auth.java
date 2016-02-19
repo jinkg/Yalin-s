@@ -126,7 +126,7 @@ public class Auth extends ASMMessageHandler implements AuthenticatorAdapter.OnAu
         } else {
             throw new ASMException(StatusCode.UAF_ASM_STATUS_ERROR);
         }
-        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), UAFClientError.NO_ERROR, new UAFMessage(response).toJson());
+        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), new UAFMessage(response).toJson());
         activity.setResult(Activity.RESULT_OK, intent);
         activity.finish();
     }

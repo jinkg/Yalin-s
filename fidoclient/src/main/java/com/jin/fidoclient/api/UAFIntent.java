@@ -154,28 +154,28 @@ public class UAFIntent {
      * If the resultCode passed to onActivityResult() is RESULT_CANCELLED,
      * If the resultCode passed to onActivityResult() is RESULT_OK, and the errorCode is NO_ERROR,
      *
-     * @param componentName
-     * @param errorCode     containing an ErrorCode value indicating the specific error condition.
-     * @param uafMessage       containing a String representation of a UAFMessage,
+     * @param componentName componentName
+     * @param uafMessage    containing a String representation of a UAFMessage,
      *                      being the UAF protocol response message to be delivered to the FIDO Server.
-     * @return
+     * @return intent
      */
-    public static Intent getUAFOperationResultIntent(String componentName, short errorCode, String uafMessage) {
+    public static Intent getUAFOperationResultIntent(String componentName, String uafMessage) {
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
         bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION_RESULT.name());
         bundle.putString(COMPONENT_NAME_KEY, componentName);
-        bundle.putShort(ERROR_CODE_KEY, errorCode);
+        bundle.putShort(ERROR_CODE_KEY, UAFClientError.NO_ERROR);
         bundle.putString(MESSAGE_KEY, uafMessage);
         intent.putExtras(bundle);
 
         return intent;
     }
 
-    public static Intent getUAFOperationCancelIntent( short errorCode) {
+    public static Intent getUAFOperationErrorIntent(String componentName, short errorCode) {
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
         bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION_RESULT.name());
+        bundle.putString(COMPONENT_NAME_KEY, componentName);
         bundle.putShort(ERROR_CODE_KEY, errorCode);
         intent.putExtras(bundle);
 

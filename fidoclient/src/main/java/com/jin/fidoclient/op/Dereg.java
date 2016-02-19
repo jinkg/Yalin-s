@@ -50,6 +50,9 @@ public class Dereg extends ASMMessageHandler {
 
     @Override
     public boolean startTraffic() {
+        if (deregistrationRequest == null) {
+            return false;
+        }
         switch (mCurrentState) {
             case PREPARE:
                 String deregMsg = dereg();
@@ -90,13 +93,27 @@ public class Dereg extends ASMMessageHandler {
 
     private void handleDeregOut(String msg) {
         StatLog.printLog(TAG, "client dereg result:" + msg);
-        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), UAFClientError.NO_ERROR, new UAFMessage(msg).toJson());
+        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), new UAFMessage(msg).toJson());
         activity.setResult(Activity.RESULT_OK, intent);
         activity.finish();
     }
 
     private DeregistrationRequest getDeregistrationRequest(String uafMsg) {
         DeregistrationRequest[] deregistrationRequests = gson.fromJson(uafMsg, DeregistrationRequest[].class);
-        return deregistrationRequests[0];
+        DeregistrationRequest request = deregistrationRequests[0];
+        if (!checkRequest(request)) {
+            request = null;
+        }
+        return request;
+    }
+
+    private boolean checkRequest(DeregistrationRequest request) {
+        if (request == null) {
+            return false;
+        }
+        if (request.authenticators == null || request.authenticators.length == 0) {
+            return false;
+        }
+        return true;
     }
 }

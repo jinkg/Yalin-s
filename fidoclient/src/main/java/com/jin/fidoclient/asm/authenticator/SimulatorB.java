@@ -40,7 +40,7 @@ public class SimulatorB extends Simulator {
 
     private static final String TAG = SimulatorB.class.getSimpleName();
     //    public static final String AAID = "EBA0#0001";
-    public static final String AAID = "FFFF#0001";
+    public static final String AAID = "EEEE#0001";
     private static final String SIMULATOR_TYPE = "face";
     private static final String ASSERTION_SCHEME = "UAFV1TLV";
 
