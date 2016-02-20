@@ -24,6 +24,7 @@ import com.jin.fidoclient.asm.db.RegRecord;
 import com.jin.fidoclient.msg.DeregistrationRequest;
 import com.jin.fidoclient.msg.RegistrationResponse;
 import com.jin.fidoclient.msg.client.UAFMessage;
+import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidotest.R;
 import com.jin.fidotest.adapter.RegRecordAdapter;
 import com.jin.fidotest.data.User;
@@ -124,12 +125,10 @@ public class RegRecordActivity extends BaseLoadActivity implements RegRecordAdap
             } else if (requestCode == REQUEST_REG) {
                 Bundle bundle = data.getExtras();
                 String message = bundle.getString(UAFIntent.MESSAGE_KEY);
-                String componentName = bundle.getString(UAFIntent.COMPONENT_NAME_KEY);
 
                 Gson gson = new Gson();
                 UAFMessage uafMessage = gson.fromJson(message, UAFMessage.class);
                 RegistrationResponse[] registrationResponses = gson.fromJson(uafMessage.uafProtocolMessage, RegistrationResponse[].class);
-                Log.d(TAG, "reg ok message : " + message + " componentName : " + componentName);
                 finishReg(registrationResponses);
             }
         }
@@ -210,6 +209,8 @@ public class RegRecordActivity extends BaseLoadActivity implements RegRecordAdap
                     }
                 }
         );
+
+        StatLog.printLog(TAG, "finish reg:" + new Gson().toJson(registrationResponses));
         request.setBody(new Gson().toJson(registrationResponses));
         request.setTag(TAG);
         requestQueue.add(request);
@@ -240,7 +241,7 @@ public class RegRecordActivity extends BaseLoadActivity implements RegRecordAdap
 
     protected void showConfirmAction(final RegRecord regRecord) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(String.format(getString(R.string.dereg_title), regRecord.touchId));
+        builder.setTitle(String.format(getString(R.string.dereg_title), regRecord.biometricsId));
         builder.setMessage(getString(R.string.dereg_prompt));
         builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
             @Override

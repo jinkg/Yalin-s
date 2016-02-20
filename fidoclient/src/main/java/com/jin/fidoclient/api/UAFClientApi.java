@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 
 import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.db.RegRecord;
@@ -35,21 +36,41 @@ public class UAFClientApi {
     }
 
     public static void doDiscover(Activity activity, int requestCode) {
+        if (activity == null) {
+            throw new IllegalArgumentException();
+        }
         Intent intent = UAFIntent.getDiscoverIntent();
         activity.startActivityForResult(intent, requestCode);
     }
 
+    public static void doCheckPolicy(Activity activity, int requestCode, String responseMessage) {
+        if (activity == null || TextUtils.isEmpty(responseMessage)) {
+            throw new IllegalArgumentException();
+        }
+        Intent intent = UAFIntent.getCheckPolicyIntent(new UAFMessage(responseMessage).toJson(), activity.getApplication().getPackageName());
+        activity.startActivityForResult(intent, requestCode);
+    }
+
     public static void doOperation(Activity activity, int requestCode, String responseMessage, String channelBinding) {
+        if (activity == null || TextUtils.isEmpty(responseMessage)) {
+            throw new IllegalArgumentException();
+        }
         Intent intent = UAFIntent.getUAFOperationIntent(new UAFMessage(responseMessage).toJson(), null, channelBinding);
         activity.startActivityForResult(intent, requestCode);
     }
 
     public static void doOperation(Fragment fragment, int requestCode, String responseMessage, String channelBinding) {
+        if (fragment == null || TextUtils.isEmpty(responseMessage)) {
+            throw new IllegalArgumentException();
+        }
         Intent intent = UAFIntent.getUAFOperationIntent(new UAFMessage(responseMessage).toJson(), null, channelBinding);
         fragment.startActivityForResult(intent, requestCode);
     }
 
     public static List<RegRecord> getRegRecords(String username) {
+        if (TextUtils.isEmpty(username)) {
+            throw new IllegalArgumentException();
+        }
         UAFDBHelper helper = UAFDBHelper.getInstance(getContext());
         SQLiteDatabase db = helper.getReadableDatabase();
         return helper.getUserRecords(db, username);
@@ -67,7 +88,7 @@ public class UAFClientApi {
         deregistrationRequests[0] = new DeregistrationRequest();
         deregistrationRequests[0].authenticators = new DeregisterAuthenticator[1];
         deregistrationRequests[0].authenticators[0] = new DeregisterAuthenticator();
-        deregistrationRequests[0].authenticators[0].aaid = ASMApi.getAAID();
+        deregistrationRequests[0].authenticators[0].aaid = regRecord.aaid;
         deregistrationRequests[0].authenticators[0].keyID = regRecord.keyId;
 
         return deregistrationRequests;

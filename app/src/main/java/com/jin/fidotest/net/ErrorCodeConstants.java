@@ -5,7 +5,7 @@ package com.jin.fidotest.net;
  * Created by 雅麟 on 2015/6/19.
  */
 public enum ErrorCodeConstants {
-    Success(0, "success"),
+    Success(1200, "success"),
     NetworkError(7777, "network error"),
     ServerError(8888, "server error"),
     UnknownError(9999, "unknown");

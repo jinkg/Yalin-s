@@ -62,7 +62,6 @@ public class KeyCodec {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-
     public static KeyPair getKeyPair()
             throws InvalidAlgorithmParameterException,
             NoSuchAlgorithmException, NoSuchProviderException {

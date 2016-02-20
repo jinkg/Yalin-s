@@ -3,11 +3,24 @@ package com.jin.fidoclient.constants;
 /**
  * Created by YaLin on 2015/10/21.
  */
-public class Constants {
-    public static final String ACTION_FIDO_OPERATION = "org.fidoalliance.intent.FIDO_OPERATION";
+public interface Constants {
+    String ACTION_FIDO_OPERATION = "org.fidoalliance.intent.FIDO_OPERATION";
 
-    public static final String PERMISSION_FIDO_CLIENT = "org.fidoalliance.uaf.permissions.FIDO_CLIENT";
+    String PERMISSION_FIDO_CLIENT = "org.fidoalliance.uaf.permissions.FIDO_CLIENT";
 
-    public static final String FIDO_CLIENT_INTENT_MIME = "application/fido.uaf_client+json";
-    public static final String FIDO_ASM_INTENT_MIME = "application/fido.uaf_asm+json";
+    String FIDO_CLIENT_INTENT_MIME = "application/fido.uaf_client+json";
+    String FIDO_ASM_INTENT_MIME = "application/fido.uaf_asm+json";
+
+    int CHALLENGE_MAX_LEN = 64;
+    int CHALLENGE_MIN_LEN = 8;
+
+    int USERNAME_MAX_LEN = 128;
+
+    int APP_ID_MAX_LEN = 512;
+
+    int SERVER_DATA_MAX_LEN = 1536;
+
+    String APP_ID_PREFIX = "https://";
+
+    String BASE64_REGULAR = "^[a-zA-Z0-9+/]+={0,2}$";
 }

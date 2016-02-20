@@ -17,7 +17,12 @@ public class ASMApi {
         Intent intent = ASMIntent.getASMOperationIntent(asmMessage);
         activity.startActivityForResult(intent, requestCode);
     }
-    public static String getAAID(){
-        return RegAssertionBuilder.AAID;
+
+    public static void doDiscover(Activity activity, int requestCode, String asmMessage) {
+        if (TextUtils.isEmpty(asmMessage)) {
+            throw new IllegalArgumentException("asmMessage can not be null");
+        }
+        Intent intent = ASMIntent.getASMOperationIntent(asmMessage);
+        activity.startActivityForResult(intent, requestCode);
     }
 }

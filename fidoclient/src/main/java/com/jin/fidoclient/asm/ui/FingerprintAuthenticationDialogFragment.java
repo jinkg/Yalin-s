@@ -18,8 +18,8 @@ package com.jin.fidoclient.asm.ui;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,18 +38,29 @@ import com.jin.fidoclient.asm.fingerprint.FingerprintUiHelper;
 public class FingerprintAuthenticationDialogFragment extends DialogFragment
         implements FingerprintUiHelper.Callback {
 
+    public interface FingerprintAuthenticationResultCallback {
+        void onAuthenticate(String fingerId);
+
+        void authenticateFailed();
+    }
+
     private Button mCancelButton;
     private View mFingerprintContent;
 
     private Stage mStage = Stage.FINGERPRINT;
 
-    private FingerprintManager.CryptoObject mCryptoObject;
+    private FingerprintManagerCompat.CryptoObject mCryptoObject;
     private FingerprintUiHelper mFingerprintUiHelper;
-    private ASMOperationActivity mActivity;
+
+    private FingerprintAuthenticationResultCallback callback;
 
     FingerprintUiHelper.FingerprintUiHelperBuilder mFingerprintUiHelperBuilder;
 
     public FingerprintAuthenticationDialogFragment() {
+    }
+
+    public FingerprintAuthenticationDialogFragment(FingerprintAuthenticationResultCallback callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -76,7 +87,8 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
 
         mFingerprintContent = v.findViewById(R.id.fingerprint_container);
 
-        FingerprintManager manager = getActivity().getApplicationContext().getSystemService(FingerprintManager.class);
+
+        FingerprintManagerCompat manager = FingerprintManagerCompat.from(getActivity());
         mFingerprintUiHelperBuilder = new FingerprintUiHelper.FingerprintUiHelperBuilder(manager);
         mFingerprintUiHelper = mFingerprintUiHelperBuilder.build(
                 (ImageView) v.findViewById(R.id.fingerprint_icon),
@@ -111,13 +123,12 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = (ASMOperationActivity) activity;
     }
 
     /**
      * Sets the crypto object to be passed in when authenticating with fingerprint.
      */
-    public void setCryptoObject(FingerprintManager.CryptoObject cryptoObject) {
+    public void setCryptoObject(FingerprintManagerCompat.CryptoObject cryptoObject) {
         mCryptoObject = cryptoObject;
     }
 
@@ -138,7 +149,9 @@ public class FingerprintAuthenticationDialogFragment extends DialogFragment
     public void onAuthenticated() {
         // Callback from FingerprintUiHelper. Let the activity know that authentication was
         // successful.
-        mActivity.fingerprintComplete("finger 1");
+        if (callback != null) {
+            callback.onAuthenticate("finger 1");
+        }
         dismiss();
     }
 

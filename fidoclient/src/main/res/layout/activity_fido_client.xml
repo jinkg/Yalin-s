@@ -8,46 +8,29 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/btn_confirm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="retry" />
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <TextView
-            android:id="@+id/textViewOperation"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/linearLayout"
-            android:layout_marginTop="22dp"
-            android:text="UAF Operation" />
+            android:text="@string/select_device_type"
+            android:textColor="@color/success_color"
+            android:textSize="16sp" />
 
-        <ScrollView
-            android:id="@+id/scrollView1"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/textViewOperation"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="24dp">
+        <TextView
+            android:id="@+id/tv_prompt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/warning_color"
+            android:textSize="16sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="25dp"
-                android:orientation="vertical">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_authenticators"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:padding="@dimen/authenticator_item_rv_padding" />
 
-                <TextView
-                    android:id="@+id/textViewOpMsg"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="25dp"
-                    android:text="" />
-
-
-            </LinearLayout>
-        </ScrollView>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -35,11 +35,8 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.logging.Logger;
 
 public class AuthAssertionBuilder {
-
-    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public String getAssertions(RegRecord regRecord, String fcParams) throws Exception {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -53,7 +50,6 @@ public class AuthAssertionBuilder {
         byteOut.write(value);
 
         String ret = Base64.encodeToString(byteOut.toByteArray(), Base64.NO_PADDING);
-        logger.info(" : assertion : " + ret);
         return ret;
     }
 
@@ -85,7 +81,7 @@ public class AuthAssertionBuilder {
         int length;
 
         byteOut.write(encodeInt(TagsEnum.TAG_AAID.id));
-        value = getAAID();
+        value = getAAID(regRecord);
         length = value.length;
         byteOut.write(encodeInt(length));
         byteOut.write(value);
@@ -166,9 +162,9 @@ public class AuthAssertionBuilder {
         return byteOut.toByteArray();
     }
 
-    private byte[] getAAID() throws IOException {
+    private byte[] getAAID(RegRecord regRecord) throws IOException {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        byte[] value = "EBA0#0001".getBytes();
+        byte[] value = regRecord.aaid.getBytes();
         byteOut.write(value);
         return byteOut.toByteArray();
     }

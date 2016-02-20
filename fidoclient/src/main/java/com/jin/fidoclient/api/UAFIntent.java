@@ -35,7 +35,7 @@ public class UAFIntent {
         intent.setType(Constants.FIDO_CLIENT_INTENT_MIME);
 
         Bundle bundle = new Bundle();
-        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.DISCOVER.type);
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.DISCOVER.name());
         intent.putExtras(bundle);
 
         return intent;
@@ -58,7 +58,7 @@ public class UAFIntent {
         Intent intent = new Intent();
 
         Bundle bundle = new Bundle();
-        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.DISCOVER_RESULT.type);
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.DISCOVER_RESULT.name());
         bundle.putString(DISCOVERY_DATA_KEY, discoveryData);
         bundle.putString(COMPONENT_NAME_KEY, componentName);
         bundle.putShort(ERROR_CODE_KEY, errorCode);
@@ -86,7 +86,7 @@ public class UAFIntent {
         intent.setType(Constants.FIDO_CLIENT_INTENT_MIME);
 
         Bundle bundle = new Bundle();
-        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.CHECK_POLICY.type);
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.CHECK_POLICY.name());
         bundle.putString(MESSAGE_KEY, message);
         bundle.putString(ORIGIN_KEY, origin);
         intent.putExtras(bundle);
@@ -109,7 +109,7 @@ public class UAFIntent {
         Intent intent = new Intent();
 
         Bundle bundle = new Bundle();
-        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.CHECK_POLICY_RESULT.type);
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.CHECK_POLICY_RESULT.name());
         bundle.putString(COMPONENT_NAME_KEY, componentName);
         bundle.putShort(ERROR_CODE_KEY, errorCode);
         intent.putExtras(bundle);
@@ -121,7 +121,7 @@ public class UAFIntent {
      * This Android intent invokes the FIDO UAF Client to process the supplied request message
      * and return a response message ready for delivery to the FIDO UAF Server.
      * The sender should assume that the FIDO UAF Client will display a user interface
-     * allowing the user to handle this intent, for example, prompting the user to complete their verification ceremony.
+     * allowing the user to prepare this intent, for example, prompting the user to complete their verification ceremony.
      * <p/>
      * This intent must be invoked with startActivityForResult().
      * <p/>
@@ -140,7 +140,7 @@ public class UAFIntent {
         intent.setType(Constants.FIDO_CLIENT_INTENT_MIME);
 
         Bundle bundle = new Bundle();
-        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION.type);
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION.name());
         bundle.putString(MESSAGE_KEY, uafMessage);
         bundle.putString(ORIGIN_KEY, origin);
         bundle.putString(CHANNEL_BINDINGS_KEY, channelBindings);
@@ -154,19 +154,29 @@ public class UAFIntent {
      * If the resultCode passed to onActivityResult() is RESULT_CANCELLED,
      * If the resultCode passed to onActivityResult() is RESULT_OK, and the errorCode is NO_ERROR,
      *
-     * @param componentName
-     * @param errorCode     containing an ErrorCode value indicating the specific error condition.
-     * @param uafMessage       containing a String representation of a UAFMessage,
+     * @param componentName componentName
+     * @param uafMessage    containing a String representation of a UAFMessage,
      *                      being the UAF protocol response message to be delivered to the FIDO Server.
-     * @return
+     * @return intent
      */
-    public static Intent getUAFOperationResultIntent(String componentName, short errorCode, String uafMessage) {
+    public static Intent getUAFOperationResultIntent(String componentName, String uafMessage) {
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION_RESULT.type);
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION_RESULT.name());
+        bundle.putString(COMPONENT_NAME_KEY, componentName);
+        bundle.putShort(ERROR_CODE_KEY, UAFClientError.NO_ERROR);
+        bundle.putString(MESSAGE_KEY, uafMessage);
+        intent.putExtras(bundle);
+
+        return intent;
+    }
+
+    public static Intent getUAFOperationErrorIntent(String componentName, short errorCode) {
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION_RESULT.name());
         bundle.putString(COMPONENT_NAME_KEY, componentName);
         bundle.putShort(ERROR_CODE_KEY, errorCode);
-        bundle.putString(MESSAGE_KEY, uafMessage);
         intent.putExtras(bundle);
 
         return intent;
@@ -187,7 +197,7 @@ public class UAFIntent {
         intent.setType(Constants.FIDO_CLIENT_INTENT_MIME);
 
         Bundle bundle = new Bundle();
-        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION_COMPLETION_STATUS.type);
+        bundle.putString(UAF_INTENT_TYPE_KEY, UAFIntentType.UAF_OPERATION_COMPLETION_STATUS.name());
         bundle.putString(MESSAGE_KEY, message);
         bundle.putShort(RESPONSE_CODE_KEY, responseCode);
         intent.putExtras(bundle);

@@ -24,6 +24,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 public class ASMRequest<T> {
+    public static final String authenticatorIndexName = "authenticatorIndex";
+
     public Request requestType;
     public Version asmVersion;
     public int authenticatorIndex;

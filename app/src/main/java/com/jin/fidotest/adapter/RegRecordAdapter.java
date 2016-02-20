@@ -38,8 +38,8 @@ public class RegRecordAdapter extends RecyclerView.Adapter<RegRecordViewHolder> 
     @Override
     public void onBindViewHolder(RegRecordViewHolder holder, int position) {
         final RegRecord regRecord = mRecords.get(position);
-        holder.tvType.setText("touchId");
-        holder.tvId.setText(regRecord.touchId);
+        holder.tvType.setText(regRecord.type);
+        holder.tvId.setText(regRecord.biometricsId);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

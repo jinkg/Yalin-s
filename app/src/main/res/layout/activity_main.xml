@@ -33,11 +33,11 @@
                 android:id="@+id/vs_loading"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout="@layout/dialog_content_loading"></ViewStub>
+                android:layout="@layout/dialog_content_loading" />
 
         </FrameLayout>
 
-        <include layout="@layout/navdrawer"></include>
+        <include layout="@layout/navdrawer"/>
     </android.support.v4.widget.DrawerLayout>
 
     <android.support.design.widget.FloatingActionButton

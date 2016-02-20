@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
 
-        <activity android:name=".ui.FIDOOperationActivity">
+        <activity android:name=".ui.UAFClientActivity">
             <intent-filter>
                 <action android:name="org.fidoalliance.intent.FIDO_OPERATION" />
                 <category android:name="android.intent.category.DEFAULT" />

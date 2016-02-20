@@ -18,6 +18,7 @@ import com.jin.fidoclient.api.UAFClientApi;
 import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidoclient.msg.AuthenticationResponse;
 import com.jin.fidoclient.msg.client.UAFMessage;
+import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidotest.R;
 import com.jin.fidotest.activity.AccountActivity;
 import com.jin.fidotest.data.User;
@@ -153,6 +154,7 @@ public class UAFLoginFragment extends BaseLoadingFragment implements View.OnClic
                     }
                 }
         );
+        StatLog.printLog(TAG, "finish auth:" + new Gson().toJson(authenticationResponses));
         request.setBody(new Gson().toJson(authenticationResponses));
         request.setTag(TAG);
         requestQueue.add(request);

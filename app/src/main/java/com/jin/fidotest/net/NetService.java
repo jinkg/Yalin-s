@@ -23,7 +23,7 @@ public class NetService {
 
     public static String HTTP_URL;
 
-    public static final String BASE_URL = "http://192.168.0.140:8080";
+    public static final String BASE_URL = "http://192.168.10.236:8080";
 
     private static final String START_REG_SUB = "/v1/public/regRequest/";
     private static final String FINISH_REG_SUB = "/v1/public/regResponse";
