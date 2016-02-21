@@ -2,13 +2,10 @@ package com.jin.fidotest.net;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 
 import com.jin.fidotest.app.MyApplication;
-
-import java.util.Map;
 
 /**
  * Created by YaLin on 2015/9/15.
@@ -61,9 +58,8 @@ public class NetService {
     }
 
     public static SharedPreferences getNetSp(Context context) {
-        SharedPreferences sp = context.getSharedPreferences(
+        return context.getSharedPreferences(
                 HTTP_SP, Context.MODE_PRIVATE);
-        return sp;
     }
 
     public static String getStartRegUrl(String username, String appId) {
@@ -72,18 +68,5 @@ public class NetService {
 
     public static String getStartAuthUrl(String appId) {
         return BASE_URL + START_AUTH_SUB + appId;
-    }
-
-    public static Map<String, String> getHostAuthHeader(String token) {
-        Map<String, String> params = new ArrayMap<>();
-        params.put("Authorization", "bearer " + token);
-        return params;
-    }
-
-    public static Map<String, String> register(String username, String password) {
-        ArrayMap params = new ArrayMap();
-        params.put("username", username);
-        params.put("password", password);
-        return params;
     }
 }
