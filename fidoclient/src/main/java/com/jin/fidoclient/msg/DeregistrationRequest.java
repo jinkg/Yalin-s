@@ -16,7 +16,7 @@
 
 package com.jin.fidoclient.msg;
 
-public class DeregistrationRequest {
+public class DeRegistrationRequest {
 	public OperationHeader header;
 	public DeregisterAuthenticator[] authenticators;
 }

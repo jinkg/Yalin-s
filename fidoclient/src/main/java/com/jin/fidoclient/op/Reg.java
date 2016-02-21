@@ -165,35 +165,32 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
         return result;
     }
 
+    @Override
+    protected boolean checkHeader(OperationHeader header) {
+        if (TextUtils.isEmpty(header.serverData) || header.serverData.length() > Constants.SERVER_DATA_MAX_LEN) {
+            return false;
+        }
+        return super.checkHeader(header);
+    }
+
+
     private boolean checkRequest(RegistrationRequest registrationRequest) {
         if (registrationRequest == null) {
             return false;
         }
-        if (registrationRequest.header == null) {
+        if (!checkChallenge(registrationRequest.challenge)) {
             return false;
         }
-        if (TextUtils.isEmpty(registrationRequest.challenge) || TextUtils.isEmpty(registrationRequest.username) || TextUtils.isEmpty(registrationRequest.header.serverData)) {
+        if (!checkHeader(registrationRequest.header)) {
             return false;
         }
-        if (registrationRequest.challenge.length() < Constants.CHALLENGE_MIN_LEN || registrationRequest.challenge.length() > Constants.CHALLENGE_MAX_LEN) {
-            return false;
-        }
-        if (!registrationRequest.challenge.matches(Constants.BASE64_REGULAR)) {
+        if (TextUtils.isEmpty(registrationRequest.username)) {
             return false;
         }
         if (registrationRequest.username.length() > Constants.USERNAME_MAX_LEN) {
             return false;
         }
-        if (registrationRequest.header.appID == null || registrationRequest.header.appID.length() > Constants.APP_ID_MAX_LEN) {
-            return false;
-        }
-        if (registrationRequest.header.appID.length() > 0 && !registrationRequest.header.appID.contains(Constants.APP_ID_PREFIX) && !registrationRequest.header.appID.equals(Utils.getFacetId(activity.getApplicationContext()))) {
-            return false;
-        }
-        if (registrationRequest.header.serverData.length() > Constants.SERVER_DATA_MAX_LEN) {
-            return false;
-        }
-        if (registrationRequest.policy == null || registrationRequest.policy.accepted == null) {
+        if (!checkPolicy(registrationRequest.policy)) {
             return false;
         }
         return true;

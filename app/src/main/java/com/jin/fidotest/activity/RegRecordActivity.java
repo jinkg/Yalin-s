@@ -9,7 +9,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.Button;
@@ -21,7 +20,7 @@ import com.google.gson.Gson;
 import com.jin.fidoclient.api.UAFClientApi;
 import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidoclient.asm.db.RegRecord;
-import com.jin.fidoclient.msg.DeregistrationRequest;
+import com.jin.fidoclient.msg.DeRegistrationRequest;
 import com.jin.fidoclient.msg.RegistrationResponse;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.utils.StatLog;
@@ -164,8 +163,8 @@ public class RegRecordActivity extends BaseLoadActivity implements RegRecordAdap
                     }
                 }
         );
-        DeregistrationRequest[] deregistrationRequests = UAFClientApi.getDeregistrationRequests(regRecord);
-        request.setBody(new Gson().toJson(deregistrationRequests));
+        DeRegistrationRequest[] deRegistrationRequests = UAFClientApi.getDeregistrationRequests(regRecord);
+        request.setBody(new Gson().toJson(deRegistrationRequests));
         request.setTag(TAG);
         requestQueue.add(request);
     }
