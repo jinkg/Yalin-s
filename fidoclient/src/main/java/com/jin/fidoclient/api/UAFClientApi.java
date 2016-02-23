@@ -79,7 +79,7 @@ public class UAFClientApi {
         return Utils.getFacetId(getContext());
     }
 
-    public static DeRegistrationRequest[] getDeregistrationRequests(RegRecord regRecord) {
+    public static DeRegistrationRequest[] getDeRegistrationRequests(RegRecord regRecord) {
         if (regRecord == null) {
             throw new IllegalArgumentException("regRecord must not be null!");
         }

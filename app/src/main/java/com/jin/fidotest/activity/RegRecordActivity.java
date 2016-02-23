@@ -163,17 +163,16 @@ public class RegRecordActivity extends BaseLoadActivity implements RegRecordAdap
                     }
                 }
         );
-        DeRegistrationRequest[] deRegistrationRequests = UAFClientApi.getDeregistrationRequests(regRecord);
+        DeRegistrationRequest[] deRegistrationRequests = UAFClientApi.getDeRegistrationRequests(regRecord);
         request.setBody(new Gson().toJson(deRegistrationRequests));
         request.setTag(TAG);
         requestQueue.add(request);
     }
 
     private void startReg(String username) {
-        String appId = UAFClientApi.getFacetId();
         showLoading();
         RequestQueue requestQueue = RequestQueueHelper.getInstance(getApplicationContext());
-        GetRequest<StartRegResponse> request = new GetRequest<>(NetService.getStartRegUrl(username, appId), StartRegResponse.class,
+        GetRequest<StartRegResponse> request = new GetRequest<>(NetService.getStartRegUrl(username, null), StartRegResponse.class,
                 new Response.Listener() {
                     @Override
                     public void onResponse(Object response) {

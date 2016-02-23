@@ -118,8 +118,8 @@ public class SimulatorB extends Simulator {
 
     @Override
     public String getKeyId() {
-        String keyId = "yalin-test2-key-" + Base64.encodeToString(BCrypt.gensalt().getBytes(), Base64.NO_WRAP);
-        keyId = Base64.encodeToString(keyId.getBytes(), Base64.URL_SAFE);
+        String keyId = "YaLin-test2-key-" + Base64.encodeToString(BCrypt.gensalt().getBytes(), Base64.NO_WRAP);
+        keyId = Base64.encodeToString(keyId.getBytes(), Base64.NO_PADDING);
 
         return keyId;
     }

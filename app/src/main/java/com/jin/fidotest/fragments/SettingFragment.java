@@ -136,10 +136,9 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
     }
 
     private void startReg(String username) {
-        String appId = UAFClientApi.getFacetId();
         showLoading();
         RequestQueue requestQueue = RequestQueueHelper.getInstance(getActivity().getApplicationContext());
-        GetRequest<StartRegResponse> request = new GetRequest<>(NetService.getStartRegUrl(username, appId), StartRegResponse.class,
+        GetRequest<StartRegResponse> request = new GetRequest<>(NetService.getStartRegUrl(username, null), StartRegResponse.class,
                 new Response.Listener() {
                     @Override
                     public void onResponse(Object response) {
