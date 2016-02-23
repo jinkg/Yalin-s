@@ -28,9 +28,9 @@ import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.asm.msg.obj.DeregisterIn;
 import com.jin.fidoclient.constants.Constants;
-import com.jin.fidoclient.msg.DeregResponse;
+import com.jin.fidoclient.msg.DeRegResponse;
 import com.jin.fidoclient.msg.DeRegistrationRequest;
-import com.jin.fidoclient.msg.DeregisterAuthenticator;
+import com.jin.fidoclient.msg.DeRegisterAuthenticator;
 import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.op.traffic.Traffic;
@@ -72,7 +72,7 @@ public class Dereg extends ASMMessageHandler {
     public boolean traffic(String asmResponseMsg) {
         switch (mCurrentState) {
             case DEREG_PENDING:
-                String deRegMsg = gson.toJson(new DeregResponse((short) 0));
+                String deRegMsg = gson.toJson(new DeRegResponse((short) 0));
                 handleDeRegOut(deRegMsg);
                 updateState(Traffic.OpStat.PREPARE);
                 break;
@@ -146,11 +146,11 @@ public class Dereg extends ASMMessageHandler {
         return true;
     }
 
-    private boolean checkAuthenticators(DeregisterAuthenticator[] authenticators) {
+    private boolean checkAuthenticators(DeRegisterAuthenticator[] authenticators) {
         if (authenticators == null) {
             return false;
         }
-        DeregisterAuthenticator authenticator = authenticators[0];
+        DeRegisterAuthenticator authenticator = authenticators[0];
         if (authenticator == null) {
             return false;
         }

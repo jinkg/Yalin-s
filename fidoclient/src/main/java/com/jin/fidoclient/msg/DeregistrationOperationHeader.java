@@ -16,7 +16,7 @@
 
 package com.jin.fidoclient.msg;
 
-public class DeregistrationOperationHeader {
+public class DeRegistrationOperationHeader {
 	public Version upv;
 	public Operation op;
 	public String appID;

@@ -9,7 +9,7 @@ import android.text.TextUtils;
 
 import com.jin.fidoclient.asm.db.RegRecord;
 import com.jin.fidoclient.asm.db.UAFDBHelper;
-import com.jin.fidoclient.msg.DeregisterAuthenticator;
+import com.jin.fidoclient.msg.DeRegisterAuthenticator;
 import com.jin.fidoclient.msg.DeRegistrationRequest;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.utils.Utils;
@@ -85,8 +85,8 @@ public class UAFClientApi {
         }
         DeRegistrationRequest[] deRegistrationRequests = new DeRegistrationRequest[1];
         deRegistrationRequests[0] = new DeRegistrationRequest();
-        deRegistrationRequests[0].authenticators = new DeregisterAuthenticator[1];
-        deRegistrationRequests[0].authenticators[0] = new DeregisterAuthenticator();
+        deRegistrationRequests[0].authenticators = new DeRegisterAuthenticator[1];
+        deRegistrationRequests[0].authenticators[0] = new DeRegisterAuthenticator();
         deRegistrationRequests[0].authenticators[0].aaid = regRecord.aaid;
         deRegistrationRequests[0].authenticators[0].keyID = regRecord.keyId;
 

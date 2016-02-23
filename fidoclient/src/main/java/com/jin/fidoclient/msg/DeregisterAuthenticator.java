@@ -16,7 +16,7 @@
 
 package com.jin.fidoclient.msg;
 
-public class DeregisterAuthenticator {
+public class DeRegisterAuthenticator {
 	public String aaid;
 	public String keyID;
 }
