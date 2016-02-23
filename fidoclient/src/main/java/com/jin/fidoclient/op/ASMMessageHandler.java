@@ -5,6 +5,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.jin.fidoclient.asm.api.StatusCode;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
@@ -22,6 +23,8 @@ import com.jin.fidoclient.ui.AuthenticatorAdapter;
 import com.jin.fidoclient.ui.UAFClientActivity;
 import com.jin.fidoclient.utils.StatLog;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,8 +41,9 @@ public abstract class ASMMessageHandler {
     public static final String AUTH_TAG = "\"Auth\"";
     public static final String DEREG_TAG = "\"Dereg\"";
 
-    private static final String MAJOR_TAG = "\"major\": 1";
-    private static final String MINOR_TAG = "\"minor\": 0";
+    private static final String UPV_TAG = "\"upv\"";
+    private static final String MAJOR_TAG = "major";
+    private static final String MINOR_TAG = "minor";
 
     protected final Gson gson = new Gson();
 
@@ -49,7 +53,17 @@ public abstract class ASMMessageHandler {
 
     public static ASMMessageHandler parseMessage(UAFClientActivity activity, String intentType, String uafMessage, String channelBinding) {
         if (UAFIntentType.UAF_OPERATION.name().equals(intentType)) {
-            if (uafMessage.contains(MAJOR_TAG) && uafMessage.contains(MINOR_TAG)) {
+            boolean versionLegal = false;
+            try {
+                String upvSub = uafMessage.substring(uafMessage.indexOf(UPV_TAG));
+                String upv = upvSub.substring(upvSub.indexOf("{"), upvSub.indexOf("}") + 1);
+                JSONObject jsonObject = new JSONObject(upv);
+                if (jsonObject.getInt(MAJOR_TAG) == 1 && jsonObject.getInt(MINOR_TAG) == 0) {
+                    versionLegal = true;
+                }
+            } catch (Exception ignored) {
+            }
+            if (versionLegal) {
                 if (uafMessage.contains(REG_TAG)) {
                     return new Reg(activity, uafMessage, channelBinding);
                 } else if (uafMessage.contains(AUTH_TAG)) {
