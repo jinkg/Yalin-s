@@ -20,6 +20,9 @@ public interface Constants {
 
     int SERVER_DATA_MAX_LEN = 1536;
 
+    int KEY_ID_MAX_LEN = 2048;
+    int KEY_ID_MIN_LEN = 32;
+
     String APP_ID_PREFIX = "https://";
 
     String BASE64_REGULAR = "^[a-zA-Z0-9+/]+={0,2}$";

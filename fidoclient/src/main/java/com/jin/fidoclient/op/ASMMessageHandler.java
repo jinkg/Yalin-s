@@ -1,6 +1,8 @@
 package com.jin.fidoclient.op;
 
 
+import android.text.TextUtils;
+
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -14,7 +16,9 @@ import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.asm.msg.obj.GetInfoOut;
 import com.jin.fidoclient.asm.msg.obj.RegisterIn;
+import com.jin.fidoclient.constants.Constants;
 import com.jin.fidoclient.msg.MatchCriteria;
+import com.jin.fidoclient.msg.OperationHeader;
 import com.jin.fidoclient.msg.Policy;
 import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.msg.client.UAFIntentType;
@@ -22,6 +26,7 @@ import com.jin.fidoclient.op.traffic.Traffic;
 import com.jin.fidoclient.ui.AuthenticatorAdapter;
 import com.jin.fidoclient.ui.UAFClientActivity;
 import com.jin.fidoclient.utils.StatLog;
+import com.jin.fidoclient.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -102,6 +107,39 @@ public abstract class ASMMessageHandler {
 
     public Policy getPolicy() {
         return null;
+    }
+
+    protected boolean checkHeader(OperationHeader header) {
+        if (header == null) {
+            return false;
+        }
+        if (header.appID == null || header.appID.length() > Constants.APP_ID_MAX_LEN) {
+            return false;
+        }
+        if (header.appID.length() > 0 && !header.appID.contains(Constants.APP_ID_PREFIX) && !header.appID.equals(Utils.getFacetId(activity.getApplicationContext()))) {
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean checkChallenge(String challenge) {
+        if (TextUtils.isEmpty(challenge)) {
+            return false;
+        }
+        if (challenge.length() < Constants.CHALLENGE_MIN_LEN || challenge.length() > Constants.CHALLENGE_MAX_LEN) {
+            return false;
+        }
+        if (!challenge.matches(Constants.BASE64_REGULAR)) {
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean checkPolicy(Policy policy) {
+        if (policy == null || policy.accepted == null) {
+            return false;
+        }
+        return true;
     }
 
     protected void updateState(Traffic.OpStat newState) {

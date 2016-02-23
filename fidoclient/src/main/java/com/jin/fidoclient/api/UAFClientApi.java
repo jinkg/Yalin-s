@@ -7,11 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
-import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.db.RegRecord;
 import com.jin.fidoclient.asm.db.UAFDBHelper;
 import com.jin.fidoclient.msg.DeregisterAuthenticator;
-import com.jin.fidoclient.msg.DeregistrationRequest;
+import com.jin.fidoclient.msg.DeRegistrationRequest;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.utils.Utils;
 
@@ -80,17 +79,17 @@ public class UAFClientApi {
         return Utils.getFacetId(getContext());
     }
 
-    public static DeregistrationRequest[] getDeregistrationRequests(RegRecord regRecord) {
+    public static DeRegistrationRequest[] getDeregistrationRequests(RegRecord regRecord) {
         if (regRecord == null) {
             throw new IllegalArgumentException("regRecord must not be null!");
         }
-        DeregistrationRequest[] deregistrationRequests = new DeregistrationRequest[1];
-        deregistrationRequests[0] = new DeregistrationRequest();
-        deregistrationRequests[0].authenticators = new DeregisterAuthenticator[1];
-        deregistrationRequests[0].authenticators[0] = new DeregisterAuthenticator();
-        deregistrationRequests[0].authenticators[0].aaid = regRecord.aaid;
-        deregistrationRequests[0].authenticators[0].keyID = regRecord.keyId;
+        DeRegistrationRequest[] deRegistrationRequests = new DeRegistrationRequest[1];
+        deRegistrationRequests[0] = new DeRegistrationRequest();
+        deRegistrationRequests[0].authenticators = new DeregisterAuthenticator[1];
+        deRegistrationRequests[0].authenticators[0] = new DeregisterAuthenticator();
+        deRegistrationRequests[0].authenticators[0].aaid = regRecord.aaid;
+        deRegistrationRequests[0].authenticators[0].keyID = regRecord.keyId;
 
-        return deregistrationRequests;
+        return deRegistrationRequests;
     }
 }
