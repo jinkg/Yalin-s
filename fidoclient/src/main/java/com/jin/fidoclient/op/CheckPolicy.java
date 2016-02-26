@@ -2,12 +2,13 @@ package com.jin.fidoclient.op;
 
 
 
+
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.Request;
 import com.jin.fidoclient.msg.Policy;
 import com.jin.fidoclient.msg.RegistrationRequest;
-import com.jin.fidoclient.ui.UAFClientActivity;
+import com.jin.fidoclient.ui.fragment.AuthenticatorListFragment;
 
 /**
  * Created by YaLin on 2016/1/18.
@@ -15,8 +16,8 @@ import com.jin.fidoclient.ui.UAFClientActivity;
 public class CheckPolicy extends ASMMessageHandler {
     private Policy policy;
 
-    public CheckPolicy(UAFClientActivity activity, String message) {
-        super(activity);
+    public CheckPolicy(AuthenticatorListFragment fragment, String message) {
+        super(fragment);
         try {
             RegistrationRequest registrationRequest = getRegistrationRequest(message);
             policy = registrationRequest.policy;

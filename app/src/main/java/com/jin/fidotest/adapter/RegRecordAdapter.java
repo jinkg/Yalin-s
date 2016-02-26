@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.jin.fidoclient.asm.db.RegRecord;
+import com.jin.fidoclient.msg.RegRecord;
 import com.jin.fidotest.R;
 
 import java.util.List;

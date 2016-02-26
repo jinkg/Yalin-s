@@ -7,11 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
-import com.jin.fidoclient.asm.db.RegRecord;
-import com.jin.fidoclient.asm.db.UAFDBHelper;
+import com.jin.fidoclient.msg.AsmInfo;
 import com.jin.fidoclient.msg.DeRegisterAuthenticator;
 import com.jin.fidoclient.msg.DeRegistrationRequest;
+import com.jin.fidoclient.msg.RegRecord;
 import com.jin.fidoclient.msg.client.UAFMessage;
+import com.jin.fidoclient.ui.UAFClientActivity;
 import com.jin.fidoclient.utils.Utils;
 
 import java.util.List;
@@ -70,9 +71,7 @@ public class UAFClientApi {
         if (TextUtils.isEmpty(username)) {
             throw new IllegalArgumentException();
         }
-        UAFDBHelper helper = UAFDBHelper.getInstance(getContext());
-        SQLiteDatabase db = helper.getReadableDatabase();
-        return helper.getUserRecords(db, username);
+        return null;
     }
 
     public static String getFacetId() {
@@ -91,5 +90,12 @@ public class UAFClientApi {
         deRegistrationRequests[0].authenticators[0].keyID = regRecord.keyId;
 
         return deRegistrationRequests;
+    }
+
+    public static AsmInfo getDefaultAsmInfo() {
+        AsmInfo info = new AsmInfo();
+        info.appName = UAFClientActivity.getAsmAppName(getContext());
+        info.pack = UAFClientActivity.getAsmAppName(getContext());
+        return info;
     }
 }

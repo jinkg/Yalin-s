@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FidoTest</string>
+    <string name="app_name">UAFClient</string>
     <string name="action_settings">Settings</string>
 
     <string name="title_setting">设置</string>
@@ -37,6 +37,8 @@
     <string name="uaf_device_reg">注册UAF设备</string>
     <string name="not_have_uaf_device">你还未注册UAF设备</string>
     <string name="already_reg">已注册UAF设备</string>
+
+    <string name="default_asm_app_name">默认ASM应用名称:%s</string>
 
     <string name="navdrawer_item_explore">Explore</string>
     <string name="navdrawer_item_my_schedule">Home</string>

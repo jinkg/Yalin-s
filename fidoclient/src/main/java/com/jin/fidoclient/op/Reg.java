@@ -27,7 +27,7 @@ import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.op.traffic.Traffic;
 import com.jin.fidoclient.ui.AuthenticatorAdapter;
-import com.jin.fidoclient.ui.UAFClientActivity;
+import com.jin.fidoclient.ui.fragment.AuthenticatorListFragment;
 import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidoclient.utils.Utils;
 
@@ -39,8 +39,8 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
 
     private String finalChallenge;
 
-    public Reg(UAFClientActivity activity, String message, String channelBinding) {
-        super(activity);
+    public Reg(AuthenticatorListFragment fragment, String message, String channelBinding) {
+        super(fragment);
         if (TextUtils.isEmpty(message)) {
             throw new IllegalArgumentException();
         }
@@ -57,13 +57,13 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
 
     @Override
     public boolean startTraffic() {
-        if (registrationRequest == null || activity == null) {
+        if (registrationRequest == null || fragment == null) {
             return false;
         }
         switch (mCurrentState) {
             case PREPARE:
                 String getInfoMessage = getInfoRequest(new Version(1, 0));
-                ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, getInfoMessage);
+                ASMApi.doOperation(fragment, REQUEST_ASM_OPERATION, getInfoMessage, asmPackage);
                 updateState(Traffic.OpStat.GET_INFO_PENDING);
                 break;
             default:
@@ -111,9 +111,9 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
         } else {
             throw new ASMException(StatusCode.UAF_ASM_STATUS_ERROR);
         }
-        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), new UAFMessage(response).toJson());
-        activity.setResult(Activity.RESULT_OK, intent);
-        activity.finish();
+        Intent intent = UAFIntent.getUAFOperationResultIntent(fragment.getActivity().getComponentName().flattenToString(), new UAFMessage(response).toJson());
+        fragment.getActivity().setResult(Activity.RESULT_OK, intent);
+        fragment.getActivity().finish();
     }
 
     private RegistrationResponse wrapResponse(RegisterOut registerOut) {
@@ -198,7 +198,7 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
 
     @Override
     public void onAuthenticatorClick(AuthenticatorInfo info) {
-        String facetId = Utils.getFacetId(activity.getApplication());
+        String facetId = Utils.getFacetId(fragment.getActivity().getApplication());
 
         FinalChallengeParams fcParams = new FinalChallengeParams();
         if (TextUtils.isEmpty(registrationRequest.header.appID)) {
@@ -220,6 +220,6 @@ public class Reg extends ASMMessageHandler implements AuthenticatorAdapter.OnAut
         asmRequest.authenticatorIndex = info.authenticatorIndex;
         String asmRequestMsg = gson.toJson(asmRequest);
         StatLog.printLog(TAG, "asm request: " + asmRequestMsg);
-        ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, asmRequestMsg);
+        ASMApi.doOperation(fragment, REQUEST_ASM_OPERATION, asmRequestMsg, asmPackage);
     }
 }

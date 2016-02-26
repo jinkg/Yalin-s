@@ -32,5 +32,10 @@
     <string name="select_device_type">All available device are present below,
         select a device to complete the operator.</string>
 
+    <string name="select_asm">All available ASM are present below,
+        select a ASM to complete the operator.</string>
+
+    <string name="no_asm">No ASM has been installed.</string>
+
     <string name="biometrics_auth">Input your biometrics to identify your identity.</string>
 </resources>

@@ -3,14 +3,11 @@ package com.jin.fidoclient.op;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
 import com.jin.fidoclient.api.UAFClientError;
 import com.jin.fidoclient.api.UAFIntent;
 import com.jin.fidoclient.asm.api.ASMApi;
 import com.jin.fidoclient.asm.api.StatusCode;
 import com.jin.fidoclient.asm.exceptions.ASMException;
-import com.jin.fidoclient.asm.msg.ASMRequest;
 import com.jin.fidoclient.asm.msg.ASMResponse;
 import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
 import com.jin.fidoclient.asm.msg.obj.GetInfoOut;
@@ -18,7 +15,7 @@ import com.jin.fidoclient.msg.Authenticator;
 import com.jin.fidoclient.msg.DiscoverData;
 import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.op.traffic.Traffic;
-import com.jin.fidoclient.ui.UAFClientActivity;
+import com.jin.fidoclient.ui.fragment.AuthenticatorListFragment;
 import com.jin.fidoclient.utils.StatLog;
 
 /**
@@ -27,8 +24,8 @@ import com.jin.fidoclient.utils.StatLog;
 public class Discover extends ASMMessageHandler {
     private static final String TAG = Discover.class.getSimpleName();
 
-    public Discover(UAFClientActivity activity) {
-        super(activity);
+    public Discover(AuthenticatorListFragment fragment) {
+        super(fragment);
         updateState(Traffic.OpStat.PREPARE);
     }
 
@@ -38,7 +35,7 @@ public class Discover extends ASMMessageHandler {
         switch (mCurrentState) {
             case PREPARE:
                 String getInfoMessage = getInfoRequest(new Version(1, 0));
-                ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, getInfoMessage);
+                ASMApi.doOperation(fragment, REQUEST_ASM_OPERATION, getInfoMessage, asmPackage);
                 updateState(Traffic.OpStat.GET_INFO_PENDING);
                 break;
             default:
@@ -87,9 +84,9 @@ public class Discover extends ASMMessageHandler {
         discoverData.clientVersion = new Version(1, 0);
         String result = gson.toJson(discoverData);
         StatLog.printLog(TAG, "discover prepare result:" + result);
-        Intent intent = UAFIntent.getDiscoverResultIntent(result, activity.getComponentName().flattenToString(), UAFClientError.NO_ERROR);
-        activity.setResult(Activity.RESULT_OK, intent);
-        activity.finish();
+        Intent intent = UAFIntent.getDiscoverResultIntent(result, fragment.getActivity().getComponentName().flattenToString(), UAFClientError.NO_ERROR);
+        fragment.getActivity().setResult(Activity.RESULT_OK, intent);
+        fragment.getActivity().finish();
         return true;
     }
 }

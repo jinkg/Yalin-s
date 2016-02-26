@@ -65,6 +65,18 @@
             android:layout_marginRight="11dp" />
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/setting_tv_asm_name"
+            style="@style/MeTextStyle"
+            android:drawableLeft="@drawable/ic_register" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

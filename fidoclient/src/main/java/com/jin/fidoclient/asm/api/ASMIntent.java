@@ -11,6 +11,13 @@ import com.jin.fidoclient.constants.Constants;
 public class ASMIntent {
     public static final String MESSAGE_KEY = "message";
 
+    public static Intent getASMIntent(){
+        Intent intent = new Intent(Constants.ACTION_FIDO_OPERATION);
+        intent.setType(Constants.FIDO_ASM_INTENT_MIME);
+
+        return intent;
+    }
+
     public static Intent getASMOperationIntent(String asmRequest) {
         Intent intent = new Intent(Constants.ACTION_FIDO_OPERATION);
         intent.setType(Constants.FIDO_ASM_INTENT_MIME);

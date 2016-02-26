@@ -17,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.jin.fidoclient.api.UAFClientApi;
 import com.jin.fidoclient.api.UAFIntent;
+import com.jin.fidoclient.msg.AsmInfo;
 import com.jin.fidoclient.msg.RegistrationResponse;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.utils.StatLog;
@@ -36,7 +37,6 @@ import com.jin.fidotest.net.response.StartRegResponse;
 public class SettingFragment extends BaseLoadingFragment implements View.OnClickListener {
     public interface SettingItemClickCallback {
         void onPersonalInfoClicked();
-
     }
 
     public static final String TAG = SettingFragment.class.getSimpleName();
@@ -45,8 +45,11 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
     private LinearLayout llHasLogin;
     private LinearLayout llNotLogin;
     private TextView tvPhone;
+    private TextView tvDefaultAsm;
 
     private View rootCoordinator;
+
+    private AsmInfo asmInfo;
 
     private SettingItemClickCallback settingItemClickCallback;
 
@@ -76,6 +79,8 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
         llHasLogin = (LinearLayout) view.findViewById(R.id.setting_ll_has_login);
         llNotLogin = (LinearLayout) view.findViewById(R.id.setting_ll_not_login);
         tvPhone = (TextView) view.findViewById(R.id.setting_tv_phone);
+        tvDefaultAsm = (TextView) view.findViewById(R.id.setting_tv_asm_name);
+        tvDefaultAsm.setOnClickListener(this);
         view.findViewById(R.id.setting_rl_personal_info).setOnClickListener(this);
         view.findViewById(R.id.setting_tv_register_device).setOnClickListener(this);
     }
@@ -89,8 +94,9 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
             llNotLogin.setVisibility(View.VISIBLE);
             llHasLogin.setVisibility(View.GONE);
         }
+        asmInfo = UAFClientApi.getDefaultAsmInfo();
+        tvDefaultAsm.setText(asmInfo.appName);
     }
-
 
     @Override
     public void onClick(View v) {
@@ -108,6 +114,9 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
                     Snackbar.make(rootCoordinator, R.string.login_before_option, Snackbar.LENGTH_SHORT)
                             .show();
                 }
+                break;
+            case R.id.setting_tv_asm_name:
+
                 break;
         }
     }

@@ -1,4 +1,4 @@
-package com.jin.fidoclient.asm.db;
+package com.jin.fidoclient.msg;
 
 import com.google.gson.Gson;
 

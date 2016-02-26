@@ -1,43 +1,34 @@
 package com.jin.fidoclient.ui;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.View;
-import android.widget.TextView;
 
 import com.jin.fidoclient.R;
 import com.jin.fidoclient.api.UAFClientError;
 import com.jin.fidoclient.api.UAFIntent;
-import com.jin.fidoclient.asm.api.ASMIntent;
-import com.jin.fidoclient.asm.exceptions.ASMException;
-import com.jin.fidoclient.asm.msg.obj.AuthenticatorInfo;
-import com.jin.fidoclient.msg.client.UAFMessage;
-import com.jin.fidoclient.op.ASMMessageHandler;
+import com.jin.fidoclient.ui.fragment.AsmListFragment;
+import com.jin.fidoclient.ui.fragment.AuthenticatorListFragment;
 import com.jin.fidoclient.utils.StatLog;
-
-import java.util.List;
 
 
 /**
  * Created by YaLin on 2015/10/21.
  */
-public class UAFClientActivity extends AppCompatActivity {
+public class UAFClientActivity extends AppCompatActivity implements AsmListFragment.AsmItemPickListener {
     private static final String TAG = UAFClientActivity.class.getSimpleName();
 
-    private View coordinator;
-    private TextView tvInfo;
-    private RecyclerView rvAuthenticators;
+    private static final String ASM_PACK_SP = "asm_pack";
+    private static final String ASM_PACK_KEY = "asm_pack_key";
+    private static final String ASM_APP_NAME_KEY = "asm_app_name_key";
 
     private String intentType;
     private String message;
     private String channelBinding;
-
-    private ASMMessageHandler asmMessageHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,69 +40,23 @@ public class UAFClientActivity extends AppCompatActivity {
         channelBinding = extras.getString(UAFIntent.CHANNEL_BINDINGS_KEY);
         StatLog.printLog(TAG, "onCreate intentType:" + intentType + " message:" + message + " channelBinding:" + channelBinding);
 
-        findView();
-        initData();
-
-        doConfirm();
-    }
-
-    void findView() {
-        rvAuthenticators = (RecyclerView) findViewById(R.id.rv_authenticators);
-        coordinator = findViewById(R.id.root_coordinator);
-        rvAuthenticators.setLayoutManager(new GridLayoutManager(this, 2));
-        tvInfo = (TextView) findViewById(R.id.tv_prompt);
-    }
-
-    void initData() {
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == ASMMessageHandler.REQUEST_ASM_OPERATION) {
-                String resultStr = data.getExtras().getString(ASMIntent.MESSAGE_KEY);
-                try {
-                    if (!asmMessageHandler.traffic(resultStr)) {
-                        finishWithError(UAFClientError.PROTOCOL_ERROR);
-                    }
-                } catch (ASMException e) {
-                    Snackbar.make(coordinator, ASMException.class.getSimpleName() + ":" + e.statusCode, Snackbar.LENGTH_SHORT)
-                            .show();
-                }
-            }
+        if (TextUtils.isEmpty(getAsmPack(getApplicationContext()))) {
+            checkAsm();
+        } else {
+            showAuthenticator();
         }
     }
 
-    private void doConfirm() {
-        if (TextUtils.isEmpty(intentType)) {
-            showError(R.string.client_op_type_error);
-            return;
-        }
-        processMessage(message);
+    private void checkAsm() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fl_content, AsmListFragment.getInstance(this))
+                .commit();
     }
 
-    private void processMessage(String inUafOperationMsg) {
-        StatLog.printLog(TAG, "process message:" + inUafOperationMsg);
-        String inMsg = extract(inUafOperationMsg);
-        StatLog.printLog(TAG, "extract message is:" + inMsg);
-        asmMessageHandler = ASMMessageHandler.parseMessage(this, intentType, inMsg, channelBinding);
-        if (!asmMessageHandler.startTraffic()) {
-            finishWithError(UAFClientError.PROTOCOL_ERROR);
-        }
-    }
-
-    private String extract(String inMsg) {
-        if (TextUtils.isEmpty(inMsg)) {
-            return null;
-        }
-        UAFMessage uafMessage = new UAFMessage();
-        uafMessage.loadFromJson(inMsg);
-        return uafMessage.uafProtocolMessage;
-    }
-
-    private void showError(int errorId) {
-        tvInfo.setText(errorId);
+    private void showAuthenticator() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fl_content, AuthenticatorListFragment.getInstance(intentType, message, channelBinding))
+                .commit();
     }
 
     @Override
@@ -119,10 +64,9 @@ public class UAFClientActivity extends AppCompatActivity {
         finishWithError(UAFClientError.USER_CANCELLED);
     }
 
-
     private void setFailedIntent(short errorCode) {
         Intent intent = UAFIntent.getUAFOperationErrorIntent(getComponentName().flattenToString(), errorCode);
-        setResult(RESULT_CANCELED, intent);
+        setResult(Activity.RESULT_CANCELED, intent);
     }
 
     private void finishWithError(short errorCode) {
@@ -130,8 +74,31 @@ public class UAFClientActivity extends AppCompatActivity {
         finish();
     }
 
-    public void showAuthenticator(List<AuthenticatorInfo> infos, AuthenticatorAdapter.OnAuthenticatorClickCallback callback) {
-        AuthenticatorAdapter adapter = new AuthenticatorAdapter(this, infos, callback);
-        rvAuthenticators.setAdapter(adapter);
+    @Override
+    public void onAsmItemPick(String pack, String appName) {
+        setAsmPack(getApplicationContext(), pack, appName);
+        showAuthenticator();
+    }
+
+    public static String getAsmPack(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(
+                ASM_PACK_SP, Context.MODE_PRIVATE);
+
+        return sp.getString(ASM_PACK_KEY, null);
+    }
+
+    public static String getAsmAppName(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(
+                ASM_PACK_SP, Context.MODE_PRIVATE);
+
+        return sp.getString(ASM_APP_NAME_KEY, null);
+    }
+
+    public static void setAsmPack(Context context, String pack, String appName) {
+        SharedPreferences sp = context.getSharedPreferences(
+                ASM_PACK_SP, Context.MODE_PRIVATE);
+        sp.edit().putString(ASM_PACK_KEY, pack)
+                .putString(ASM_APP_NAME_KEY, appName)
+                .apply();
     }
 }

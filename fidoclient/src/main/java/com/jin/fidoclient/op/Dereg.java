@@ -34,7 +34,7 @@ import com.jin.fidoclient.msg.DeRegisterAuthenticator;
 import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.msg.client.UAFMessage;
 import com.jin.fidoclient.op.traffic.Traffic;
-import com.jin.fidoclient.ui.UAFClientActivity;
+import com.jin.fidoclient.ui.fragment.AuthenticatorListFragment;
 import com.jin.fidoclient.utils.StatLog;
 
 
@@ -45,8 +45,8 @@ public class Dereg extends ASMMessageHandler {
 
     private final DeRegistrationRequest deRegistrationRequest;
 
-    public Dereg(UAFClientActivity activity, String message) {
-        super(activity);
+    public Dereg(AuthenticatorListFragment fragment, String message) {
+        super(fragment);
         updateState(Traffic.OpStat.PREPARE);
         this.deRegistrationRequest = getDeRegistrationRequest(message);
     }
@@ -59,7 +59,7 @@ public class Dereg extends ASMMessageHandler {
         switch (mCurrentState) {
             case PREPARE:
                 String deRegMsg = deReg();
-                ASMApi.doOperation(activity, REQUEST_ASM_OPERATION, deRegMsg);
+                ASMApi.doOperation(fragment, REQUEST_ASM_OPERATION, deRegMsg, asmPackage);
                 updateState(Traffic.OpStat.DEREG_PENDING);
                 break;
             default:
@@ -96,9 +96,9 @@ public class Dereg extends ASMMessageHandler {
 
     private void handleDeRegOut(String msg) {
         StatLog.printLog(TAG, "client deReg result:" + msg);
-        Intent intent = UAFIntent.getUAFOperationResultIntent(activity.getComponentName().flattenToString(), new UAFMessage(msg).toJson());
-        activity.setResult(Activity.RESULT_OK, intent);
-        activity.finish();
+        Intent intent = UAFIntent.getUAFOperationResultIntent(fragment.getActivity().getComponentName().flattenToString(), new UAFMessage(msg).toJson());
+        fragment.getActivity().setResult(Activity.RESULT_OK, intent);
+        fragment.getActivity().finish();
     }
 
     private DeRegistrationRequest getDeRegistrationRequest(String uafMsg) {

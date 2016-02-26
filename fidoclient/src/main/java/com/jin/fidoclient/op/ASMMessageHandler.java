@@ -7,7 +7,6 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.jin.fidoclient.asm.api.StatusCode;
 import com.jin.fidoclient.asm.exceptions.ASMException;
 import com.jin.fidoclient.asm.msg.ASMRequest;
@@ -24,7 +23,7 @@ import com.jin.fidoclient.msg.Version;
 import com.jin.fidoclient.msg.client.UAFIntentType;
 import com.jin.fidoclient.op.traffic.Traffic;
 import com.jin.fidoclient.ui.AuthenticatorAdapter;
-import com.jin.fidoclient.ui.UAFClientActivity;
+import com.jin.fidoclient.ui.fragment.AuthenticatorListFragment;
 import com.jin.fidoclient.utils.StatLog;
 import com.jin.fidoclient.utils.Utils;
 
@@ -38,6 +37,10 @@ import java.util.List;
  * Created by YaLin on 2016/1/11.
  */
 public abstract class ASMMessageHandler {
+
+    public interface StateChangeListener {
+        void onStateChange(Traffic.OpStat newState, Traffic.OpStat oldState);
+    }
 
     public static final String TAG = ASMMessageHandler.class.getSimpleName();
     public static final int REQUEST_ASM_OPERATION = 1;
@@ -54,9 +57,12 @@ public abstract class ASMMessageHandler {
 
     protected Traffic.OpStat mCurrentState = Traffic.OpStat.PREPARE;
 
-    protected final UAFClientActivity activity;
+    protected final AuthenticatorListFragment fragment;
+    protected StateChangeListener stateChangeListener;
 
-    public static ASMMessageHandler parseMessage(UAFClientActivity activity, String intentType, String uafMessage, String channelBinding) {
+    protected String asmPackage;
+
+    public static ASMMessageHandler parseMessage(AuthenticatorListFragment fragment, String intentType, String uafMessage, String channelBinding) {
         if (UAFIntentType.UAF_OPERATION.name().equals(intentType)) {
             boolean versionLegal = false;
             try {
@@ -70,21 +76,21 @@ public abstract class ASMMessageHandler {
             }
             if (versionLegal) {
                 if (uafMessage.contains(REG_TAG)) {
-                    return new Reg(activity, uafMessage, channelBinding);
+                    return new Reg(fragment, uafMessage, channelBinding);
                 } else if (uafMessage.contains(AUTH_TAG)) {
-                    return new Auth(activity, uafMessage, channelBinding);
+                    return new Auth(fragment, uafMessage, channelBinding);
                 } else if (uafMessage.contains(DEREG_TAG)) {
-                    return new Dereg(activity, uafMessage);
+                    return new Dereg(fragment, uafMessage);
                 }
             }
         } else if (UAFIntentType.CHECK_POLICY.name().equals(intentType)) {
-            return new CheckPolicy(activity, uafMessage);
+            return new CheckPolicy(fragment, uafMessage);
         } else if (UAFIntentType.DISCOVER.name().equals(intentType)) {
-            return new Discover(activity);
+            return new Discover(fragment);
         } else if (UAFIntentType.UAF_OPERATION_COMPLETION_STATUS.name().equals(intentType)) {
-            return new Completion(activity);
+            return new Completion(fragment);
         }
-        return new ASMMessageHandler(activity) {
+        return new ASMMessageHandler(fragment) {
             @Override
             public boolean startTraffic() {
                 return false;
@@ -97,13 +103,25 @@ public abstract class ASMMessageHandler {
         };
     }
 
-    public ASMMessageHandler(UAFClientActivity activity) {
-        this.activity = activity;
+    public void setStateChangeListener(StateChangeListener listener) {
+        stateChangeListener = listener;
+    }
+
+    public ASMMessageHandler(AuthenticatorListFragment fragment) {
+        this.fragment = fragment;
     }
 
     public abstract boolean startTraffic();
 
     public abstract boolean traffic(String asmResponseMsg) throws ASMException;
+
+    public String getCurrentOpDescription() {
+        return null;
+    }
+
+    public void setAsmPackage(String asmPackage) {
+        this.asmPackage = asmPackage;
+    }
 
     public Policy getPolicy() {
         return null;
@@ -116,7 +134,7 @@ public abstract class ASMMessageHandler {
         if (header.appID == null || header.appID.length() > Constants.APP_ID_MAX_LEN) {
             return false;
         }
-        if (header.appID.length() > 0 && !header.appID.contains(Constants.APP_ID_PREFIX) && !header.appID.equals(Utils.getFacetId(activity.getApplicationContext()))) {
+        if (header.appID.length() > 0 && !header.appID.contains(Constants.APP_ID_PREFIX) && !header.appID.equals(Utils.getFacetId(fragment.getActivity().getApplicationContext()))) {
             return false;
         }
         return true;
@@ -144,6 +162,9 @@ public abstract class ASMMessageHandler {
 
     protected void updateState(Traffic.OpStat newState) {
         StatLog.printLog(TAG, "update op state:" + mCurrentState.name() + "->" + newState.name());
+        if (stateChangeListener != null) {
+            stateChangeListener.onStateChange(newState, mCurrentState);
+        }
         mCurrentState = newState;
     }
 
@@ -190,7 +211,7 @@ public abstract class ASMMessageHandler {
         if (parseResult == null || parseResult.size() == 0) {
             return false;
         }
-        activity.showAuthenticator(parseResult, callback);
+        fragment.showAuthenticator(parseResult, callback);
         return true;
     }
 
