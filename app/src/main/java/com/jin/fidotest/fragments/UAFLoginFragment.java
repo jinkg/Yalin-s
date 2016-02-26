@@ -116,10 +116,9 @@ public class UAFLoginFragment extends BaseLoadingFragment implements View.OnClic
     }
 
     private void startAuth() {
-        String appId = UAFClientApi.getFacetId();
         showLoading();
         RequestQueue requestQueue = RequestQueueHelper.getInstance(getActivity().getApplicationContext());
-        GetRequest<StartAuthResponse> request = new GetRequest<>(NetService.getStartAuthUrl(appId), StartAuthResponse.class,
+        GetRequest<StartAuthResponse> request = new GetRequest<>(NetService.getStartAuthUrl(null), StartAuthResponse.class,
                 new Response.Listener() {
                     @Override
                     public void onResponse(Object response) {
