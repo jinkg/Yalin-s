@@ -4,9 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -14,10 +13,13 @@ import android.text.TextUtils;
 import com.jin.fidoclient.R;
 import com.jin.fidoclient.api.UAFClientError;
 import com.jin.fidoclient.api.UAFIntent;
+import com.jin.fidoclient.asm.api.ASMIntent;
 import com.jin.fidoclient.msg.AsmInfo;
 import com.jin.fidoclient.ui.fragment.AsmListFragment;
 import com.jin.fidoclient.ui.fragment.AuthenticatorListFragment;
 import com.jin.fidoclient.utils.StatLog;
+
+import java.util.List;
 
 
 /**
@@ -96,11 +98,14 @@ public class UAFClientActivity extends AppCompatActivity implements AsmListFragm
                 ASM_INFO_SP, Context.MODE_PRIVATE);
         String name = sp.getString(ASM_APP_NAME_KEY, null);
         String pack = sp.getString(ASM_PACK_KEY, null);
-        Drawable icon = null;
+        ResolveInfo resolveInfo = resolve(context, pack);
         AsmInfo info = new AsmInfo();
         info.appName(name)
-                .pack(pack)
-                .icon(icon);
+                .pack(pack);
+        if (resolveInfo != null) {
+            info.icon = resolveInfo.loadIcon(context.getPackageManager());
+        }
+
         return info;
     }
 
@@ -113,7 +118,20 @@ public class UAFClientActivity extends AppCompatActivity implements AsmListFragm
         sp.edit().putString(ASM_PACK_KEY, info.pack)
                 .putString(ASM_APP_NAME_KEY, info.appName)
                 .apply();
-        if (info.icon != null) {
+    }
+
+    private static ResolveInfo resolve(Context context, String pack) {
+        if (TextUtils.isEmpty(pack)) {
+            return null;
+        }
+        Intent intent = ASMIntent.getASMIntent();
+        intent.setPackage(pack);
+
+        List<android.content.pm.ResolveInfo> infos = context.getPackageManager().queryIntentActivities(intent, PackageManager.GET_INTENT_FILTERS);
+        if (infos != null && infos.size() > 0) {
+            return infos.get(0);
+        } else {
+            return null;
         }
     }
 }

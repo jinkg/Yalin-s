@@ -97,12 +97,17 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
             llHasLogin.setVisibility(View.GONE);
         }
         asmInfo = UAFClientApi.getDefaultAsmInfo();
-        if (!TextUtils.isEmpty(asmInfo.appName)) {
-            tvDefaultAsm.setText(asmInfo.appName);
-            tvDefaultAsm.setOnClickListener(this);
-        } else if (!TextUtils.isEmpty(asmInfo.pack)) {
-            tvDefaultAsm.setOnClickListener(this);
-            tvDefaultAsm.setText(asmInfo.pack);
+        if (asmInfo != null) {
+            if (!TextUtils.isEmpty(asmInfo.appName)) {
+                tvDefaultAsm.setText(asmInfo.appName);
+                tvDefaultAsm.setOnClickListener(this);
+            } else if (!TextUtils.isEmpty(asmInfo.pack)) {
+                tvDefaultAsm.setOnClickListener(this);
+                tvDefaultAsm.setText(asmInfo.pack);
+            } else {
+                tvDefaultAsm.setOnClickListener(null);
+                tvDefaultAsm.setText(R.string.default_asm_none);
+            }
         } else {
             tvDefaultAsm.setOnClickListener(null);
             tvDefaultAsm.setText(R.string.default_asm_none);
@@ -219,6 +224,7 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
     protected void showAsmInfoAction(final AsmInfo asmInfo) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(asmInfo.appName);
+        builder.setIcon(asmInfo.icon);
         builder.setMessage(getString(R.string.asm_pack_prompt, asmInfo.pack));
         builder.setPositiveButton(R.string.reset, new DialogInterface.OnClickListener() {
             @Override
