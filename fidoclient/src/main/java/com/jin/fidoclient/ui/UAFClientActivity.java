@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -11,6 +14,7 @@ import android.text.TextUtils;
 import com.jin.fidoclient.R;
 import com.jin.fidoclient.api.UAFClientError;
 import com.jin.fidoclient.api.UAFIntent;
+import com.jin.fidoclient.msg.AsmInfo;
 import com.jin.fidoclient.ui.fragment.AsmListFragment;
 import com.jin.fidoclient.ui.fragment.AuthenticatorListFragment;
 import com.jin.fidoclient.utils.StatLog;
@@ -22,7 +26,7 @@ import com.jin.fidoclient.utils.StatLog;
 public class UAFClientActivity extends AppCompatActivity implements AsmListFragment.AsmItemPickListener {
     private static final String TAG = UAFClientActivity.class.getSimpleName();
 
-    private static final String ASM_PACK_SP = "asm_pack";
+    private static final String ASM_INFO_SP = "asm_pack";
     private static final String ASM_PACK_KEY = "asm_pack_key";
     private static final String ASM_APP_NAME_KEY = "asm_app_name_key";
 
@@ -75,30 +79,41 @@ public class UAFClientActivity extends AppCompatActivity implements AsmListFragm
     }
 
     @Override
-    public void onAsmItemPick(String pack, String appName) {
-        setAsmPack(getApplicationContext(), pack, appName);
+    public void onAsmItemPick(AsmInfo info) {
+        setAsmInfo(getApplicationContext(), info);
         showAuthenticator();
     }
 
     public static String getAsmPack(Context context) {
         SharedPreferences sp = context.getSharedPreferences(
-                ASM_PACK_SP, Context.MODE_PRIVATE);
+                ASM_INFO_SP, Context.MODE_PRIVATE);
 
         return sp.getString(ASM_PACK_KEY, null);
     }
 
-    public static String getAsmAppName(Context context) {
+    public static AsmInfo getAsmInfo(Context context) {
         SharedPreferences sp = context.getSharedPreferences(
-                ASM_PACK_SP, Context.MODE_PRIVATE);
-
-        return sp.getString(ASM_APP_NAME_KEY, null);
+                ASM_INFO_SP, Context.MODE_PRIVATE);
+        String name = sp.getString(ASM_APP_NAME_KEY, null);
+        String pack = sp.getString(ASM_PACK_KEY, null);
+        Drawable icon = null;
+        AsmInfo info = new AsmInfo();
+        info.appName(name)
+                .pack(pack)
+                .icon(icon);
+        return info;
     }
 
-    public static void setAsmPack(Context context, String pack, String appName) {
+    public static void setAsmInfo(Context context, AsmInfo info) {
+        if (info == null) {
+            info = new AsmInfo();
+        }
         SharedPreferences sp = context.getSharedPreferences(
-                ASM_PACK_SP, Context.MODE_PRIVATE);
-        sp.edit().putString(ASM_PACK_KEY, pack)
-                .putString(ASM_APP_NAME_KEY, appName)
+                ASM_INFO_SP, Context.MODE_PRIVATE);
+        sp.edit().putString(ASM_PACK_KEY, info.pack)
+                .putString(ASM_APP_NAME_KEY, info.appName)
                 .apply();
+        if (info.icon != null) {
+        }
     }
 }

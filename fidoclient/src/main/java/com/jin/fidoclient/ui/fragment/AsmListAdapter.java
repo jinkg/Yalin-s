@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jin.fidoclient.R;
+import com.jin.fidoclient.msg.AsmInfo;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public class AsmListAdapter extends RecyclerView.Adapter<AsmListViewHolder> {
     public interface ASMClickListener {
-        void onAsmItemClicked(String pack, String appName);
+        void onAsmItemClicked(AsmInfo info);
     }
 
     private final Context mContext;
@@ -43,14 +44,20 @@ public class AsmListAdapter extends RecyclerView.Adapter<AsmListViewHolder> {
         final ResolveInfo info = mInfos.get(position);
         final String label = info.loadLabel(mContext.getPackageManager()).toString();
         Drawable drawable = info.loadIcon(mContext.getPackageManager());
+        final AsmInfo asmInfo = new AsmInfo();
+        asmInfo.appName(label)
+                .pack(info.activityInfo.packageName)
+                .icon(drawable);
+
         holder.tvName.setText(label);
         holder.tvPack.setText(info.activityInfo.packageName);
         holder.ivIcon.setImageDrawable(drawable);
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
                                                @Override
                                                public void onClick(View v) {
                                                    if (mCallback != null) {
-                                                       mCallback.onAsmItemClicked(info.activityInfo.packageName, label);
+                                                       mCallback.onAsmItemClicked(asmInfo);
                                                    }
                                                }
                                            }

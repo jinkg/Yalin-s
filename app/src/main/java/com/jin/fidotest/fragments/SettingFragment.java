@@ -1,9 +1,12 @@
 package com.jin.fidotest.fragments;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,7 +83,6 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
         llNotLogin = (LinearLayout) view.findViewById(R.id.setting_ll_not_login);
         tvPhone = (TextView) view.findViewById(R.id.setting_tv_phone);
         tvDefaultAsm = (TextView) view.findViewById(R.id.setting_tv_asm_name);
-        tvDefaultAsm.setOnClickListener(this);
         view.findViewById(R.id.setting_rl_personal_info).setOnClickListener(this);
         view.findViewById(R.id.setting_tv_register_device).setOnClickListener(this);
     }
@@ -95,7 +97,16 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
             llHasLogin.setVisibility(View.GONE);
         }
         asmInfo = UAFClientApi.getDefaultAsmInfo();
-        tvDefaultAsm.setText(asmInfo.appName);
+        if (!TextUtils.isEmpty(asmInfo.appName)) {
+            tvDefaultAsm.setText(asmInfo.appName);
+            tvDefaultAsm.setOnClickListener(this);
+        } else if (!TextUtils.isEmpty(asmInfo.pack)) {
+            tvDefaultAsm.setOnClickListener(this);
+            tvDefaultAsm.setText(asmInfo.pack);
+        } else {
+            tvDefaultAsm.setOnClickListener(null);
+            tvDefaultAsm.setText(R.string.default_asm_none);
+        }
     }
 
     @Override
@@ -116,7 +127,7 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
                 }
                 break;
             case R.id.setting_tv_asm_name:
-
+                showAsmInfoAction(asmInfo);
                 break;
         }
     }
@@ -203,6 +214,22 @@ public class SettingFragment extends BaseLoadingFragment implements View.OnClick
         dismissLoading();
         Snackbar.make(rootCoordinator, msg, Snackbar.LENGTH_SHORT)
                 .show();
+    }
+
+    protected void showAsmInfoAction(final AsmInfo asmInfo) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(asmInfo.appName);
+        builder.setMessage(getString(R.string.asm_pack_prompt, asmInfo.pack));
+        builder.setPositiveButton(R.string.reset, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                UAFClientApi.clearDefaultAsm();
+                initData();
+            }
+        });
+        builder.setNegativeButton(R.string.confirm, null);
+
+        builder.create().show();
     }
 
 }

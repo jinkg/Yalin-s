@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.jin.fidoclient.R;
 import com.jin.fidoclient.asm.api.ASMIntent;
+import com.jin.fidoclient.msg.AsmInfo;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ import java.util.List;
  */
 public class AsmListFragment extends Fragment implements AsmListAdapter.ASMClickListener {
     public interface AsmItemPickListener {
-        void onAsmItemPick(String pack, String appName);
+        void onAsmItemPick(AsmInfo info);
     }
 
     private static final String TAG = AsmListFragment.class.getSimpleName();
@@ -80,9 +81,9 @@ public class AsmListFragment extends Fragment implements AsmListAdapter.ASMClick
     }
 
     @Override
-    public void onAsmItemClicked(String pack, String appName) {
+    public void onAsmItemClicked(AsmInfo info) {
         if (listener != null) {
-            listener.onAsmItemPick(pack, appName);
+            listener.onAsmItemPick(info);
         }
     }
 }

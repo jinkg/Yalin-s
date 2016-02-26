@@ -93,9 +93,10 @@ public class UAFClientApi {
     }
 
     public static AsmInfo getDefaultAsmInfo() {
-        AsmInfo info = new AsmInfo();
-        info.appName = UAFClientActivity.getAsmAppName(getContext());
-        info.pack = UAFClientActivity.getAsmAppName(getContext());
-        return info;
+        return UAFClientActivity.getAsmInfo(getContext());
+    }
+
+    public static void clearDefaultAsm() {
+        UAFClientActivity.setAsmInfo(getContext(), null);
     }
 }
