@@ -13,9 +13,5 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         super(Application.class);
     }
 
-    public void testBase64Encoded() {
-        String base64String = "WWFMaW4tdGVzdDIta2V5LUpESmhKREV3SkhwcFlXUllja2xRU0dSbFZtZDBSM3BoVmsxT1kyVT0\n";
-        String base64String1 = base64String.trim();
-        assertTrue(base64String1.matches(Constants.BASE64_REGULAR));
-    }
+
 }

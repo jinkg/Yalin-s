@@ -160,7 +160,7 @@ public class Dereg extends ASMMessageHandler {
         if (authenticator.aaid.length() != 9 || authenticator.keyID.length() < Constants.KEY_ID_MIN_LEN || authenticator.keyID.length() > Constants.KEY_ID_MAX_LEN) {
             return false;
         }
-        if (!authenticator.keyID.trim().matches(Constants.BASE64_REGULAR)) {
+        if (!authenticator.keyID.trim().matches(Constants.BASE64_URL_REGULAR)) {
             return false;
         }
         if (authenticator.keyID.contains("=")) {

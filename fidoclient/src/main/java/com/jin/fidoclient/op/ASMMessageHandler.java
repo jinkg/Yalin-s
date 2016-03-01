@@ -147,7 +147,7 @@ public abstract class ASMMessageHandler {
         if (challenge.length() < Constants.CHALLENGE_MIN_LEN || challenge.length() > Constants.CHALLENGE_MAX_LEN) {
             return false;
         }
-        if (!challenge.matches(Constants.BASE64_REGULAR)) {
+        if (!challenge.matches(Constants.BASE64_URL_REGULAR)) {
             return false;
         }
         return true;

@@ -56,7 +56,7 @@ public class AuthenticatorAdapter extends RecyclerView.Adapter<AuthenticatorItem
                 background.setColorFilter(primaryColor, PorterDuff.Mode.SRC_IN);
                 holder.ivIcon.setBackground(background);
             } else {
-                holder.ivIcon.setImageResource(info.iconRes);
+                holder.ivIcon.setImageResource(R.drawable.ic_fp_40px);
             }
 
         }

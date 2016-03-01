@@ -26,4 +26,5 @@ public interface Constants {
     String APP_ID_PREFIX = "https://";
 
     String BASE64_REGULAR = "^[a-zA-Z0-9+/]+={0,2}$";
+    String BASE64_URL_REGULAR = "^[a-zA-Z0-9-_]+={0,2}$";
 }
